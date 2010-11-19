@@ -1,0 +1,2 @@
+function conc = find_intensity_log4param(beta, xrange, intensity)
+% Benjamin Grant, Rice University McDevitt Lab 09/14/2010

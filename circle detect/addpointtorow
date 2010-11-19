@@ -1,0 +1,8 @@
+function extrap = addpointtorow(row,number);
+ if(length(row1)<5)
+      row1unknownx = row1(1,1) - (row1(4,1) - row1(1,1))/3;
+      row1distancex = row1unknownx - row1(1,1);
+      row1slope = (row1(4,2) - row1(1,2))/(row1(4,1)-row1(1,1));
+      row1unknowny = row1distancex * row1slope+row1(1,2);
+      row1 = sortrows([row1unknownx row1unknowny; row1]);
+  end

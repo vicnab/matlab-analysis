@@ -1,0 +1,9 @@
+data I-LP SD-LP CV-LP I-CAOI SD-CAOI CV-CAOI beads-LP beads-cAOI
+Group-1 255 0 0 255 0 0 4 4
+Group-2 25.9818 2.3244 0.0895 22.1958 2.2665 0.1021 6 6
+Group-3 45.4217 3.0357 0.0668 40.9680 2.2435 0.0548 8 8
+Group-4 NaN NaN NaN NaN NaN NaN NaN NaN
+Group-5 NaN NaN NaN NaN NaN NaN NaN NaN
+Group-6 NaN NaN NaN NaN NaN NaN NaN NaN
+Group-7 NaN NaN NaN NaN NaN NaN NaN NaN
+Group-8 NaN NaN NaN NaN NaN NaN NaN NaN

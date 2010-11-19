@@ -1,0 +1,10 @@
+function [intensity_shift] = log4param(beta,int_shift,x)
+%function [intensity_shift] = log4param(beta,int_shift,x) 
+%this function plots the intenisty utilizing parameters 
+%y = a+b*(exp(c-d*log(x)))./(1+exp(c - d*log(x)));
+a = beta(1);
+b = beta(2);
+c = beta(3);
+d = beta(4);
+y_shift = a+b*(exp(c-d*log(x)))./(1+exp(c - d*log(x)));
+y_shift = y_shift - int_exp;

@@ -1,0 +1,11 @@
+%passdir = uigetdir('C:\Users\Ben\Documents\My Dropbox\Cell Phone Project\Images\10_22_2010');
+passdir = 'C:\Users\Ben\Documents\My Dropbox\Cell Phone Project\Images\10_22_2010\Run 1' ;
+tb1 = [2 3 4];
+tb2 = [7 8 9];
+tb3 = [12 13 14];
+tb4 = [17 18 19];
+cb1 = [5 10 15];
+cb2 = [6 11 16];
+cb4 = cb2;
+cb3=cb2;
+run4 = Analyze_Beads_Revision2(passdir, 4, tb1, cb1, tb2, cb2, tb3, cb3, tb4, cb4);

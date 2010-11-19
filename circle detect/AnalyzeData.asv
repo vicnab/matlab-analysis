@@ -1,0 +1,26 @@
+function AnalyzeData(numpos,numtests, negname, posrun1,posrun2,posrun3,posrun4)
+data = struct();
+for i = 1:numpos
+    strucvar = sprintf('posrun%1.0f', i);
+    data.(strucvar) = importdata(sprintf('%s.mat', eval(strucvar)))
+    for j = 1:numtests
+        testvar = sprintf('test%1.0f', j);
+        contvar = sprintf('cont%1.0f', j);
+        Red.Med.(testvar).(strucvar) = [data.(strucvar).(testvar).RedMedTest];
+        Red.Med.(contvar).(strucvar) = [data.(strucvar).(testvar).RedMedCont];
+        Green.Med.(testvar).(strucvar) = [data.(strucvar).(testvar).GreenMedTest];
+        Green.Med.(contvar).(strucvar) = [data.(strucvar).(testvar).GreenMedCont];
+        Blue.Med.(testvar).(strucvar) = [data.(strucvar).(testvar).BlueMedTest];
+        Blue.Med.(contvar).(strucvar) = [data.(strucvar).(testvar).BlueMedCont];
+         Gray.Med.(testvar).(strucvar) = [data.(strucvar).(testvar).BlueMedTest];
+        Blue.Med.(contvar).(strucvar) = [data.(strucvar).(testvar).BlueMedCont];
+        Red.Std.(testvar).(strucvar) = [data.(strucvar).(testvar).RedStdTest];
+        Red.Std.(contvar).(strucvar) = [data.(strucvar).(testvar).RedStdCont];
+        Green.Std.(testvar).(strucvar) = [data.(strucvar).(testvar).GreenStdTest];
+        Green.Std.(contvar).(strucvar) = [data.(strucvar).(testvar).GreenStdCont];
+        Blue.Std.(testvar).(strucvar) = [data.(strucvar).(testvar).BlueStdTest];
+        Blue.Std.(contvar).(strucvar) = [data.(strucvar).(testvar).BlueStdCont];
+    end
+            
+end
+keyboard();

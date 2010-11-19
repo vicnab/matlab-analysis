@@ -1,0 +1,79 @@
+function [Fitdata,Fitdatagof,Fitdataoutput,Fitdataresiduals,Fitdatayy,Fitdataresid,yyy,yyy2,yyy3,range2x,range2y,rr2,currenty,currentx,currentymax,currentxmax]= dataanalyzer (numberofcontrols,xarray,yarray,ET,sdarray)
+%[Fitdata,Fitdatagof,Fitdataoutput,Fitdataresiduals,Fitdatayy,Fitdataresid,yyy,yyy2,yyy3,range2x,range2y,rr2,currenty,currentx]= dataanalyzer (8,xx',bigy,ET,bigsd);
+tic
+noc=numberofcontrols;
+sizex=size(xarray);
+[sizey,pp]=size(yarray);
+
+%if sizex+sizey=2*sizex
+%    display ('Your x and y array are not the same size.  Check the arrays please.');
+%
+%end
+
+xarray1=xarray(1:noc);
+exposurecounter=sizey/noc;
+counter=0;
+ymatrix=ones(noc,exposurecounter);
+sdmatrix=ones(noc,exposurecounter);
+for i=1:exposurecounter
+ymatrix(1:noc,i)=yarray(counter*noc+1:counter*noc+noc);
+sdmatrix(1:noc,i)=sdarray(counter*noc+1:counter*noc+noc);
+counter=counter+1;
+end
+figure(1);
+
+for i=1:exposurecounter
+  
+  %axis=[0 max(xarray) 0 25];
+
+yarray1=ymatrix(1:noc,i);    
+sdarray1=sdmatrix(1:noc,i);
+[fresult,gof,output,yy,residuals,fresult2,gof2,output2,fresult3,gof3,output3,weightvector]= powerfit(xarray1,yarray1,sdarray1);
+Fitdata{i}=[fresult];
+Fitdatagof{i}=[gof];
+Fitdataoutput{i}=[output];
+Fitdatayy{i}=[yy];
+weightvectormatrix{i}=weightvector;
+residuals;
+xxx=linspace(1,1000000,10000);
+yyyy=linspace(min(yarray1),255,1000);
+yyy(i,:)=fresult(xxx);
+yyy2(i,:)=fresult2(xxx);
+yyy3(i,:)=fresult3(xxx);
+Fitdataresiduals{i}=[residuals];
+subplot(3,3,i,'replace','title',(ET(i)),'axis', ([1 10^6 0 300]));
+semilogx(xxx,yyy(i,:),xxx,yyy2(i,:),xxx,yyy3(i,:),xarray1,yarray1,'x');
+title(ET(i))
+legend ('5 parameter SD Weights','5 parameter Default Weights','4 parameter','data','location','NorthWest');
+mom(i,:) = residuals;
+%title(ET(i));
+
+Fitdataresid(i)=sum(mom(i,:));
+%yyy2i=[find(255>yyy2(i,:)>min(yyy2(i,:))*1.05)]
+%yyy2range=[xxx(max(yyy2i))-xxx(min(yyy2i))]
+yyy2i=[find(255>yyy2(i:i,:))];
+yyy2ii=[find(yyy2(i:i,1:max(yyy2i))>1.05*min(yyy2(i:i,:)))];
+dx2=max(xxx(yyy2ii))- min(xxx(yyy2ii));
+dy2=max(yyy2(yyy2ii))- min(yyy2(yyy2ii));
+range2x(i)=dx2;
+range2y(i)=dy2;
+rr2(i,1)=dx2*dy2;
+ [a,b,c]=find(yyy(i:i,:)>1.05*min(yyy(i:i,:)));
+ [d,e,f]=find(yyy(i:i,:)<250);
+currenty(i)= yyy(i:i,min(b));
+currentx(i)=[ xxx(min(b))];
+currentymax(i)=[ yyy(i:i,max(e))];
+currentxmax(i)=[ xxx(max(e))];
+
+end
+rr2(:,2)=ET;
+rr2;
+toc
+%yyy2range
+Fitdataresid;
+
+%unk = input('Enter Unknown Intensity ');
+%sd = input('Enter Unknown SD ');
+%FTU = input('Choose Fit to Use ');
+
+%unknownfinder(Fitdata{FTU},unk,sd,ET(FTU));

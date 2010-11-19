@@ -1,0 +1,50 @@
+function [bm]=newdatacompiler(numberofexposures,numberofconcs,ETnew)
+
+%ij.IJ.run('Macro test 042310 v10 AOI multi pic TEST BEAD STATUS')
+
+noe=numberofexposures;
+noc=numberofconcs;
+bm=zeros(noe,noc);
+dmILP=zeros(noe,noc);
+dmSDLP=zeros(noe,noc);
+dmCVLP=zeros(noe,noc);
+dmICLP=zeros(noe,noc);
+dmSDC=zeros(noe,noc);
+dmCVC=zeros(noe,noc);
+p1='';
+
+MasterPath=['C:\Documents and Settings\carevalos\Desktop\McDevitt Lab\Inputfiles'];
+ppbm=getAllFiles(MasterPath);
+counter=1;
+for i=1:numel(ppbm)
+k = findstr(['summary'], ppbm{i});
+if numel(k)~=0
+    pbm(counter)={char(ppbm(i))}
+    counter=counter+1;
+else
+end
+end
+    
+% for i=1:numel(pbm)
+%     
+%     bm{i}=pbm{i};
+% end
+  counter=1;  
+ for i=1:noc
+    for j=1:noe
+         bm{i,j}=pbm{counter};
+        counter=counter+1;
+    end
+ end
+
+%for i=1:noc
+%   para=char(mew{i});
+%   for j=1:noe
+%  bm{i,j}=[fidfirstFile{i} para(j,:)];
+%   end
+%end
+
+
+
+
+

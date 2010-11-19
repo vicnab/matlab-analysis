@@ -1,0 +1,22 @@
+function [beta_est x_graph y_graph] = dose_response_sigmoidal(x,y,beta0)
+%%x is the concentrations in original form, not log values and y is the
+%%intensity, beta is an optional argument containing the guesses for the 4
+%%parameters of logistic curve fitting using the equation y = d
+%%+(a-d)/[1+(x/c)^b]
+if(nargin <2)
+    error('Must enter dependent and independent vraiables', 'MESSAGE')
+elseif (nargin == 2)
+    beta0 = [1 1 1 1000]; %parameter guess
+end
+options = statset('MaxIter', 100000);
+[beta_est,r,J,COVB,mse] = nlinfit(log(x),y,@sigmoidfun, beta0, options);
+
+x_graph = logspace(-4,4,1000);
+y_graph = log4alt(beta_est, log(x_graph));
+semilogx(x,y,'*');
+hold on
+semilogx(x_graph,y_graph);
+hold off
+xlabel('Log(concentration)');
+ylabel('Intensity');
+title('Sigmoidal fit to dose response curve');

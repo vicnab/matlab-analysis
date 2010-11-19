@@ -1,0 +1,3 @@
+function AnalyzeData(numpos,neg, posrun1,posrun2,posrun3,posrun4)
+for i = 1:numpos
+    

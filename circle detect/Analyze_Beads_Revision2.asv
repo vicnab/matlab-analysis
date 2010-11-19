@@ -1,0 +1,387 @@
+function data_cell = AnalyzeBeads(direct, numtest, tb1,cb1,tb2,cb2,tb3,cb3,tb4,cb4,tb5,cb5);
+%% This section of code determines the infromation about the number of
+%% images, the image with the highest exposure (used to find the beads) and
+%% all the imge filenames and corresponding exposure
+curdirect = pwd;
+path(path,direct);
+cd(direct);
+imginfo = struct('name', [], 'exp', []); %% keeps track of every image name and exposure in directory
+direct_info = dir;
+num_image = 0;
+cal_exp = 60;
+cal_exp_index = 0;
+for a = 1:length(direct_info)
+
+    if(isempty(regexp(direct_info(a).name, 'top')))  %% want to exclude any top lit images from analysis
+
+        if(isempty(regexp(direct_info(a).name, 'Run')))  %% Run * files are already analyzed files
+            if(~isempty(regexp(direct_info(a).name, '[0-9]')))  %% find images only with exposure time listed
+                if(~isempty(regexp(direct_info(a).name, 'ms'))) %% to make sure it's an image file
+                    imginfo(num_image+1).name = direct_info(a).name; %%saves file name
+                    expindex = regexp(direct_info(a).name, '[0-9]'); %%finds exposure time
+                    exposure = str2num(direct_info(a).name(expindex));
+                    imginfo(num_image+1).exp = exposure;  %%records exposure time
+                    num_image = num_image + 1; %%indexes number of images
+                end
+
+            end
+        end
+    end
+end
+[BS order] = sort([imginfo.exp]);
+
+imginfo = imginfo(order);
+
+calfile= imginfo(find([imginfo.exp] == cal_exp)).name;
+calimg = imread(calfile);
+calimg = calimg(:,:,1);
+calimg = 255/(max(max(calimg))) * calimg;
+%rawimg = rgb2gray(imgcol(100:800, 1:800, :));
+% rawimg = imread('TestImg_CHT_a3.bmp');
+%  rawimg = imread('TestImg_CHT_a2.bmp');
+path(path,curdirect);
+tic;
+[accum, circen, cirrad] = CircularHough_Grd(calimg, [8 25], 4,15,1);
+clear accum;
+
+%figure(1); imagesc(accum); axis image;
+%title('Accumulation Array from Circular Hough Transform');
+
+
+row1 = sortrows(circen(find(circen(:,2)<.3*10^3),:));
+row2 = sortrows(circen(find(circen(:,2) < .5*10^3 & circen(:,2) > .3*10^3),:));
+row3 = sortrows(circen(find(circen(:,2) < .7*10^3 & circen(:,2) > .5*10^3),:));
+row4 = sortrows(circen(find(circen(:,2)>.7*10^3),:));
+%%extrapolates missing circles (because calibrator beads are too dark!
+
+for r =1:4
+    rowname = sprintf('row%1.0f', r);
+    if (length(eval(rowname))<5)
+        minxy = min(eval(rowname));
+        minx = minxy(1);
+        maxxy = max(eval(rowname));
+        maxx = maxxy(1);
+        if(minx>300)
+            extrapcom= sprintf('%s = addpointtorow(%s,1);', rowname, rowname); %%if the first bead is a calibrator bead, this will create circle where line angle dictates it should be
+            eval(extrapcom);
+        end
+        if(maxx<900)
+            extrapcom= sprintf('%s = addpointtorow(%s,5);', rowname, rowname); %%if the first bead is a calibrator bead, this will create circle where line angle dictates it should be
+            eval(extrapcom);
+        end
+    end
+end
+centers = [row1;row2;row3;row4];
+pracrad = mean(cirrad)*.8;
+figure(1); imagesc(calimg); colormap('gray'); axis image;
+hold on;
+%plot(centers(:,1), centers(:,2), 'g+');
+for k = 1 : size(centers, 1),
+    DrawCircle(centers(k,1), centers(k,2), pracrad, 32, 'r-');
+end
+centers_cell = cell(11,1);
+for p =1:length(centers)-1
+    dist_cons = abs(centers(p)-centers(p+1)) + abs(centers(p)-centers(p+1));
+    if (dist_cons < 2)
+        centers = removerows(centers,p+1);
+    end
+    if ((p+1)>length(centers))
+        break
+    end
+    
+end
+for m = 1:length(centers_cell)
+    centers_cell{m} = centers;
+end
+
+clear centers
+
+title(['Raw Image with Circles Detected ', ...
+    '(center positions and radii marked)']);
+%figure(3); surf(accum, 'EdgeColor', 'none'); axis ij;
+%title('3-D View of the Accumulation Array');
+hold off;
+clear calimg;
+
+for i = 1:num_image
+    figure(1)
+    centers = centers_cell{i};
+    img = imread(imginfo(i).name);
+    img = img(:,:,3);
+    figure(1); imagesc(img);  axis image;
+    hold on;
+    %plot(centers(:,1), centers(:,2), 'g+');
+    for k = 1 : size(centers, 1),
+        DrawCircle(centers(k,1), centers(k,2), pracrad, 32, 'r-');
+
+    end
+    hold off;
+    CentersValid = questdlg('Are the centers acceptable?', 'CentersQuest','Yes', 'No', 'No');
+    while (strcmp(CentersValid,'No'))
+        FixAction = questdlg('How would you like to fix?', 'Fix','Delete Circle','Redraw for this Exposure', 'Nevermind They Are Fine', 'Nevermind They Are Fine');
+        switch FixAction
+            case 'Delete Circle'
+                rect = getrect;
+                xmin =rect(1);
+                xmax = rect(1) + rect(3);
+                ymin = rect(2);
+                ymax = rect(2) + rect(4);
+                rowremove = find(centers(:,1)>xmin & centers(:,1) < xmax & centers(:,1) & centers(:,2) > ymin & centers(:,2) <ymax);
+                %centers = removerows(centers, rowremove);
+
+                if (length(centers) - length(rowremove)<20)
+
+                    if  (length(rowremove > 1)); %%if there's a cluster of circles your remove you need this I think
+                        for f = 2:length(rowremove)
+                            deleterow = rowremove(f);
+                            centers = removerows(centers,deleterow);
+                        end
+                        rowremove = rowremove(1);
+                    end
+
+                    rowpos = mod(rowremove,5);
+                    switch rowpos
+                        case 0
+                            x1 = centers(rowremove-4, 1);
+                            x2 = centers(rowremove-1, 1);
+                            y1 = centers(rowremove-4, 2);
+                            y2 = centers(rowremove-1, 2);
+                            xdist = (x2 - x1)/3;
+                            newx = x2 + xdist;
+                            slope = (y2-y1)/(x2-x1);
+                            newy = slope *xdist + y2;
+                            centers(rowremove, 1) = newx;
+                            centers(rowremove,2) = newy;
+                            oldcenters = [centers(1:rowremove-1, :); centers(rowremove+1:end,:)];
+                        case 1
+                            x1 = centers(rowremove+1, 1);
+                            x2 = centers(rowremove+4, 1);
+                            y1 = centers(rowremove+1, 2);
+                            y2 = centers(rowremove+4, 2);
+                            xdist = (x2 - x1)/3;
+                            newx = x1 - xdist;
+                            slope = (y2-y1)/(x2-x1);
+                            newy = y1 - slope *xdist;
+                            centers(rowremove, 1) = newx;
+                            centers(rowremove,2) = newy;
+                            oldcenters = [centers(1:rowremove-1, :); centers(rowremove+1:end,:)];
+                        case 2
+                            x1 = centers(rowremove-1, 1);
+                            x2 = centers(rowremove+3, 1);
+                            y1 = centers(rowremove-1, 2);
+                            y2 = centers(rowremove+3, 2);
+                            xdist = (x2 - x1)/4;
+                            newx = x1 + xdist;
+                            slope = (y2-y1)/(x2-x1);
+                            newy = y1 + slope *xdist;
+                            centers(rowremove, 1) = newx;
+                            centers(rowremove,2) = newy;
+                            oldcenters = [centers(1:rowremove-1, :); centers(rowremove+1:end,:)];
+                        case 3
+                            x1 = centers(rowremove-2, 1);
+                            x2 = centers(rowremove+2, 1);
+                            y1 = centers(rowremove-2, 2);
+                            y2 = centers(rowremove+2, 2);
+                            xdist = (x2 - x1)/4;
+                            newx = x1 + 2*xdist;
+                            slope = (y2-y1)/(x2-x1);
+                            newy = y1 + slope *2*xdist;
+                            centers(rowremove, 1) = newx;
+                            centers(rowremove,2) = newy;
+                            oldcenters = [centers(1:rowremove-1, :); centers(rowremove+1:end,:)];
+                        case 4
+                            x1 = centers(rowremove-3, 1);
+                            x2 = centers(rowremove+1, 1);
+                            y1 = centers(rowremove-3, 2);
+                            y2 = centers(rowremove+1, 2);
+                            xdist = (x2 - x1)/4;
+                            newx = x1 + 3*xdist;
+                            slope = (y2-y1)/(x2-x1);
+                            newy = y1 + slope *3*xdist;
+                            centers(rowremove, 1) = newx;
+                            centers(rowremove,2) = newy;
+                            oldcenters = [centers(1:rowremove-1, :); centers(rowremove+1:end,:)];
+
+                    end
+                    hold on;
+                    figure(1); imagesc(img);  axis image;
+                    % plot(oldcenters(:,1), oldcenters(:,2), 'g+');
+                    for k = 1 : size(oldcenters, 1),
+                        DrawCircle(oldcenters(k,1), oldcenters(k,2), pracrad, 32, 'r-');
+                    end
+                    pause(1);
+                    %plot(centers(rowremove,1), centers(rowremove,2), 'g+');
+
+
+                    DrawCircle(centers(rowremove,1), centers(rowremove,2), pracrad, 32, 'r-');
+                    hold off;
+                    CentersValid = questdlg('Are the centers acceptable?', 'CentersQuest','Yes', 'No', 'No');
+
+                else
+                    for deleterow = rowremove;
+                        centers = removerows(centers,deleterow);
+                    end
+                    figure(1); imagesc(img);  axis image;
+                    hold on;
+                    %plot(centers(:,1), centers(:,2), 'g+');
+                    for k = 1 : size(centers, 1),
+                        DrawCircle(centers(k,1), centers(k,2), pracrad, 32, 'r-');
+
+                    end
+                    hold off;
+                    CentersValid = questdlg('Are the centers acceptable?', 'CentersQuest','Yes', 'No', 'No');
+                end
+
+
+            case 'Redraw for this Exposure'
+                newcalimg = img(:,:,1);
+                newcalimg = 255/max(max(newcalimg)) * newcalimg;
+                [accum, circen, cirrad] = CircularHough_Grd(newcalimg, [8 25], 4,15,1);
+                clear accum;
+
+                %figure(1); imagesc(accum); axis image;
+                %title('Accumulation Array from Circular Hough Transform');
+
+
+                row1 = sortrows(circen(find(circen(:,2)<.3*10^3),:));
+                row2 = sortrows(circen(find(circen(:,2) < .5*10^3 & circen(:,2) > .3*10^3),:));
+                row3 = sortrows(circen(find(circen(:,2) < .7*10^3 & circen(:,2) > .5*10^3),:));
+                row4 = sortrows(circen(find(circen(:,2)>.7*10^3),:));
+                %%extrapolates missing circles (because calibrator beads are too dark!
+                for r =1:4
+                    rowname = sprintf('row%1.0f', r);
+                    if (length(eval(rowname))<5)
+                        minxy = min(eval(rowname));
+                        minx = minxy(1);
+                        maxxy = max(eval(rowname));
+                        maxx = maxxy(1);
+                        if(minx>300)
+                            extrapcom= sprintf('%s = addpointtorow(%s,1);', rowname, rowname); %%if the first bead is a calibrator bead, this will create circle where line angle dictates it should be
+                            eval(extrapcom);
+                        end
+                        if(maxx<900)
+                            extrapcom= sprintf('%s = addpointtorow(%s,5);', rowname, rowname); %%if the first bead is a calibrator bead, this will create circle where line angle dictates it should be
+                            eval(extrapcom);
+                        end
+                    end
+                end
+                centers = [row1;row2;row3;row4];
+                figure(1); imagesc(img);  axis image;
+                hold on;
+                %plot(centers(:,1), centers(:,2), 'g+');
+                for k = 1 : size(centers, 1),
+                    DrawCircle(centers(k,1), centers(k,2), pracrad, 32, 'r-');
+
+                end
+                hold off;
+                CentersValid = questdlg('Are the centers acceptable?', 'CentersQuest','Yes', 'No', 'No');
+            case 'Nevermind They Are Fine'
+                CentersValid = 'Yes';
+        end
+    end
+
+    centers_cell{i} = centers;
+end
+for i = 1:num_image
+    figure(1)
+    centers = centers_cell{i};
+    img = imread(imginfo(i).name);
+
+    figure(1); imagesc(img);  axis image;
+    hold on;
+    % plot(centers(:,1), centers(:,2), 'g+');
+    for k = 1 : size(centers, 1),
+        DrawCircle(centers(k,1), centers(k,2), pracrad, 32, 'r-');
+
+    end
+    hold off;
+    pause(1);
+end
+data_cell = cell(2*numtest+1,10);
+data_cell(1,:) = {'Condition', 'Exposure', 'Red Intensity Mean', 'Red Intensity Std', 'Green Intensity Mean', 'Green Intensity Std', 'Blue Intensity Mean', 'Blue Intensity Std', 'Gray Intensity Mean', 'Gray Intensity Std'};
+
+for j = 1:num_image;
+    centers = centers_cell{j};
+    img = imread(imginfo(j).name);
+    [rows cols colors] = size(img);
+    clear img; %image is huge and slowing everything down
+    xind = [];
+    yind = [];
+    for vals = 1:length(centers);
+        for x = 1:cols
+            for y = 1:rows
+                dist = (x-centers(vals,1))^2 + (y-centers(vals,2))^2;
+                dist = dist^(1/2);
+                if(dist<pracrad)
+                    xind = [x vals; xind];
+                    yind = [y vals; yind];
+                end
+            end
+        end
+    end
+    red_int = zeros(20,1);
+    green_int = zeros(20,1);
+    blue_int = zeros(20,1);
+    gray_int = zeros(20,1);
+    img = imread(imginfo(j).name);
+    grayimg = rgb2gray(img);
+    for bead = 1:length(centers)
+        ind_interest = find(xind(:,2)==bead);
+        xindex_interest = xind(ind_interest);
+        yindex_interest = yind(ind_interest);
+        redvals = [];
+        greenvals = [];
+        bluevals = [];
+        grayvals = [];
+        for k = 1:length(xindex_interest)
+            redvals = [img(yindex_interest(k),xindex_interest(k),1); redvals];
+            greenvals = [img(yindex_interest(k),xindex_interest(k),2); greenvals];
+            bluevals = [img(yindex_interest(k),xindex_interest(k),3); bluevals];
+            grayvals = [grayimg(yindex_interest(k),xindex_interest(k)); grayvals];
+        end
+        red_int(bead) = median(redvals);
+        green_int(bead) = median(greenvals);
+        blue_int(bead) = median(bluevals);
+        gray_int(bead) = median(grayvals);
+    end
+    counter = 1;
+    for condition = 1:numtest
+        counter = counter +1;
+        strucname = sprintf('test%1.0f', condition);
+        testname = sprintf('tb%1.0f', condition);
+        contname = sprintf('cb%1.0f', condition);
+        data_cell{counter,1} = sprintf('Test %1.0f', condition);
+        data_cell{counter,2} = [data_cell{counter,2} imginfo(j).exp;]
+        data_cell{counter,3} = [data_cell{counter,3} mean(red_int(eval(testname)))];
+        data_cell{counter,4} = [data_cell{counter,4} std(red_int(eval(testname)))];
+        data_cell{counter,5} = [data_cell{counter,5} mean(green_int(eval(testname)))];
+        data_cell{counter,6} = [data_cell{counter,6} std(green_int(eval(testname)))];
+        data_cell{counter,7} = [data_cell{counter,7} mean(blue_int(eval(testname)))];
+        data_cell{counter,8} = [data_cell{counter,8} std(blue_int(eval(testname)))];
+        data_cell{counter,9} = [data_cell{counter,9} mean(gray_int(eval(testname)))];
+        data_cell{counter,10} = [data_cell{counter,10} std(gray_int(eval(testname)))];
+        counter = counter+1;
+        data_cell{counter,1} = sprintf('Control %1.0f', condition);
+        data_cell{counter,2} = [data_cell{counter,2} imginfo(j).exp] ;
+        data_cell{counter,3} = [data_cell{counter,3} mean(red_int(eval(contname)))];
+        data_cell{counter,4} = [data_cell{counter,4} std(red_int(eval(contname)))];
+        data_cell{counter,5} = [data_cell{counter,5} mean(green_int(eval(contname)))];
+        data_cell{counter,6} = [data_cell{counter,6} std(green_int(eval(contname)))];
+        data_cell{counter,7} = [data_cell{counter,7} mean(blue_int(eval(contname)))];
+        data_cell{counter,8} = [data_cell{counter,8} std(blue_int(eval(contname)))];
+        data_cell{counter,9} = [data_cell{counter,9} mean(gray_int(eval(contname)))];
+        data_cell{counter,10} = [data_cell{counter,10} std(gray_int(eval(contname)))];
+    end
+end
+
+
+
+
+%clear;
+
+
+cd(curdirect);
+
+
+
+

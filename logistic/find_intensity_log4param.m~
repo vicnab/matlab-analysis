@@ -1,0 +1,6 @@
+function conc = find_intensity_log4param(beta, conc_min, conc_max intensity)
+% Benjamin Grant, Rice University McDevitt Lab 09/14/2010
+% this function finds the corresponding concentration to a given intensity
+% based upon a defined 4 parameter logistic curve. beta are simply the
+% parameters defining the curve, conc_min is the minimium concentration
+% that this intensity could reasonably correspond to and conc_max is the 

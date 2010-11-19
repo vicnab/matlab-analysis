@@ -1,0 +1,6 @@
+subplot(2,1,1)
+a = imread('luanyicp5.png');
+imagesc(a);
+set(gca, 'YTickLabel', []);
+set(gca, 'XTickLabel', []);
+subplot(2,2,2);
