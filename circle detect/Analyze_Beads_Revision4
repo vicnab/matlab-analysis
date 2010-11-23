@@ -346,7 +346,7 @@ for i = 1:num_image
 end
 data_cell = cell(2*numtest+1,10);
 data_cell(1,:) = {'Condition', 'Exposure', 'Red Intensity Mean', 'Red Intensity Std', 'Green Intensity Mean', 'Green Intensity Std', 'Blue Intensity Mean', 'Blue Intensity Std', 'Gray Intensity Mean', 'Gray Intensity Std'};
-tic
+
 for j = 1:num_image;
     centers = centers_cell{j};
     img = imread(imginfo(j).name);
@@ -422,7 +422,7 @@ for j = 1:num_image;
     end
 end
 
-toc
+
 
 
 %clear;

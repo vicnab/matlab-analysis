@@ -34,7 +34,8 @@ imginfo = imginfo(order);
 
 calfile= imginfo(find([imginfo.exp] == cal_exp)).name;
 calimg = imread(calfile);
-calimg = calimg(:,:,1);
+%calimg = calimg(:,:,1);
+calimg = rgb2gray(calimg);
 calimg = 255/(max(max(calimg))) * calimg;
 %rawimg = rgb2gray(imgcol(100:800, 1:800, :));
 % rawimg = imread('TestImg_CHT_a3.bmp');

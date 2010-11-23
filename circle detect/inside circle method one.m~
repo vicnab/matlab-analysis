@@ -1,0 +1,3 @@
+img = imread('garbage.tiff');
+tic
+rows = 

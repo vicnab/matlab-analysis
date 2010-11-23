@@ -41,7 +41,7 @@ calimg = 255/(max(max(calimg))) * calimg;
 %  rawimg = imread('TestImg_CHT_a2.bmp');
 path(path,curdirect);
 tic;
-[accum, circen, cirrad] = CircularHough_Grd(calimg, [8 25], 4,15,1);
+[accum, circen, cirrad] = CircularHough_Grd(calimg, [8 35], 4,15,1);
 clear accum;
 
 %figure(1); imagesc(accum); axis image;
@@ -54,23 +54,23 @@ row3 = sortrows(circen(find(circen(:,2) < .7*10^3 & circen(:,2) > .5*10^3),:));
 row4 = sortrows(circen(find(circen(:,2)>.7*10^3),:));
 %%extrapolates missing circles (because calibrator beads are too dark!
 
-for r =1:4
-    rowname = sprintf('row%1.0f', r);
-    if (length(eval(rowname))<5)
-        minxy = min(eval(rowname));
-        minx = minxy(1);
-        maxxy = max(eval(rowname));
-        maxx = maxxy(1);
-        if(minx>300)
-            extrapcom= sprintf('%s = addpointtorow(%s,1);', rowname, rowname); %%if the first bead is a calibrator bead, this will create circle where line angle dictates it should be
-            eval(extrapcom);
-        end
-        if(maxx<900)
-            extrapcom= sprintf('%s = addpointtorow(%s,5);', rowname, rowname); %%if the first bead is a calibrator bead, this will create circle where line angle dictates it should be
-            eval(extrapcom);
-        end
-    end
-end
+% for r =1:4
+%     rowname = sprintf('row%1.0f', r);
+%     if (length(eval(rowname))<5)
+%         minxy = min(eval(rowname));
+%         minx = minxy(1);
+%         maxxy = max(eval(rowname));
+%         maxx = maxxy(1);
+%         if(minx>300)
+%             extrapcom= sprintf('%s = addpointtorow(%s,1);', rowname, rowname); %%if the first bead is a calibrator bead, this will create circle where line angle dictates it should be
+%             eval(extrapcom);
+%         end
+%         if(maxx<900)
+%             extrapcom= sprintf('%s = addpointtorow(%s,5);', rowname, rowname); %%if the first bead is a calibrator bead, this will create circle where line angle dictates it should be
+%             eval(extrapcom);
+%         end
+%     end
+% end
 centers = [row1;row2;row3;row4];
 pracrad = mean(cirrad)*.8;
 figure(1); imagesc(calimg); colormap('gray'); axis image;
@@ -324,7 +324,7 @@ for i = 1:num_image
         centers_cell{i} = centers;
     end
     
-    
+   
 end
 for i = 1:num_image
     figure(1)
@@ -350,48 +350,34 @@ tic
 for j = 1:num_image;
     centers = centers_cell{j};
     img = imread(imginfo(j).name);
-    [rows cols colors] = size(img);
-    clear img; %image is huge and slowing everything down
-    xind = [];
-    yind = [];
-    for vals = 1:length(centers);
-        for x = 1:cols
-            for y = 1:rows
-                dist = (x-centers(vals,1))^2 + (y-centers(vals,2))^2;
-                dist = dist^(1/2);
-                if(dist<=pracrad)
-                    xind = [x vals; xind];
-                    yind = [y vals; yind];
-                end
-            end
-        end
-    end
-    red_int = zeros(20,1);
-    green_int = zeros(20,1);
-    blue_int = zeros(20,1);
-    gray_int = zeros(20,1);
-    img = imread(imginfo(j).name);
-    img = img(:,:,1:3);
     grayimg = rgb2gray(img);
-    for bead = 1:length(centers)
-        ind_interest = find(xind(:,2)==bead);
-        xindex_interest = xind(ind_interest);
-        yindex_interest = yind(ind_interest);
-        redvals = [];
-        greenvals = [];
-        bluevals = [];
-        grayvals = [];
-        for k = 1:length(xindex_interest)
-            redvals = [img(yindex_interest(k),xindex_interest(k),1); redvals];
-            greenvals = [img(yindex_interest(k),xindex_interest(k),2); greenvals];
-            bluevals = [img(yindex_interest(k),xindex_interest(k),3); bluevals];
-            grayvals = [grayimg(yindex_interest(k),xindex_interest(k)); grayvals];
-        end
-        red_int(bead) = median(redvals);
-        green_int(bead) = median(greenvals);
-        blue_int(bead) = median(bluevals);
-        gray_int(bead) = median(grayvals);
+    [m n unused] = size(img);
+  
+    red_val = [];
+    green_val = [];
+    blue_val = [];
+    gray_val = [];
+    for vals = 1:length(centers);
+        h_ellipse = imellipse(gca,[centers(vals,1)-pracrad centers(vals,2)-pracrad 2*pracrad 2*pracrad]);
+        api = iptgetapi(h_ellipse);
+        vert = api.getVertices();
+        mask = poly2mask(vert(:,1),vert(:,2),m,n);
+         %mask = repmat(mask,[1,1,3]);
+         [row col] = find(mask == 1);
+         for q = 1 :length(row)
+             red_val(q) = img(row(q), col(q), 1);
+             green_val(q) = img(row(q), col(q), 2);
+             blue_val(q) = img(row(q), col(q), 3);
+             gray_val(q) = grayimg(row(q), col(q));
+         end
+         red_int(vals) = median(red_val);
+         green_int(vals) = median(green_val);
+         blue_int(vals) = median(blue_val);
+         gray_int(vals) = median(gray_val);
+            
+        
     end
+
     counter = 1;
     for condition = 1:numtest
         counter = counter +1;
@@ -422,8 +408,8 @@ for j = 1:num_image;
     end
 end
 
-toc
 
+toc
 
 %clear;
 

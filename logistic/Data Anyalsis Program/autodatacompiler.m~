@@ -6,7 +6,7 @@ noc=numberofconcs;
 bm=[];
 p1='';
 
-MasterPath=['/Users/Ben/Documents/logistic/Data Anyalsis Program/Inputfiles'];
+MasterPath=['/Users/Ben/matlab-analysis/logistic/Data Anyalsis Program/Inputfiles'];
 ppbm=getAllFiles(MasterPath);
 counter=1;
 for i=1:numel(ppbm)
@@ -28,7 +28,7 @@ end
  end
 
  
- MasterPath=['C:\Documents and Settings\carevalos\Desktop\McDevitt Lab\Data Anyalsis Program\Control Files'];
+ MasterPath=['/Users/Ben/Documents/logistic/Data Anyalsis Program/Control Files'];
 cppbm=getAllFiles(MasterPath);
 ccounter=1;
 for i=1:numel(cppbm)
