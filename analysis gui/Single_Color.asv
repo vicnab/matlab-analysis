@@ -5,25 +5,21 @@ function data_cell = Single_Color(plothandle, test, cont);
 [numtest samples] = size(cont);
 curdirect = pwd;
 if(ispc)
-    direct = uigetdir('C:\Users\Benjamingrantdu\Documents\My Dropbox\Cell Phone Project\Images\10_22_2010');
+    direct = uigetdir('C:\Users\Ben\Documents\My Dropbox\Cell Phone Project\Images\10_22_2010');
     circlepath = 'C:\Users\Benjamingrantdu\matlab-analysis\circle detect';
     AnalysisPath = 'C:\Users\Benjamingrantdu\matlab-analysis\Analysis_Methods\Line_Profile';
 
 elseif(ismac)
     direct = uigetdir('/Users/Ben/Dropbox/Cell Phone Project/Images/11_05_2010/');
-    circlepath = '/Users/Ben/matlab-analysis/circle detect';
-    AnalysisPath = '/Users/Ben/matlab-analysis/Analysis_Methods/Line_Profile';
+    circlepath = '/Users/Ben/matlab-analysis/circle detect'
 else
     disp('Not a mac or a PC ?????')
 end
 if(isempty(regexp(path,direct)))
     path(path,direct);
 end
-if(isempty(regexp(path,circlepath)))
-    path(path, circlepath);
-end
-if(isempty(regexp(path,AnalysisPath)))
-    path(path, AnalysisPath)
+if(isempty(regexp(path, '/Users/Ben/matlab-analysis/Analysis_Methods/Line_Profile')))
+    path(path, '~/matlab-analysis/Analysis_Methods/Line_Profile/');
 end
 
 cd(direct);
@@ -246,7 +242,7 @@ for i = 1:num_image
                         centers = [row1;row2;row3;row4];
                         
                         hold on;
-                        axes(plothandle); imagesc(img);  axis image;
+                        figure(1); imagesc(img);  axis image;
                         xlabel('X Pixels');
                         ylabel('Y Pixels');
                         title(sprintf('Exposure %2.0f ms', imginfo(i).exp));
@@ -264,7 +260,7 @@ for i = 1:num_image
                         hold off;
                     else
                         centers = removerows(centers, rowremove);
-                        axes(plothandle); imagesc(img);  axis image;
+                        figure(1); imagesc(img);  axis image;
                         xlabel('X Pixels');
                         ylabel('Y Pixels');
                         title(sprintf('Exposure %2.0f ms', imginfo(i).exp));
@@ -316,7 +312,7 @@ for i = 1:num_image
                     end
                 end
                 centers = [row1;row2;row3;row4];
-                axes(plothandle); imagesc(img);  axis image;
+                figure(1); imagesc(img);  axis image;
                 xlabel('X Pixels');
                 ylabel('Y Pixels');
                 title(sprintf('Exposure %2.0f ms', imginfo(i).exp));
