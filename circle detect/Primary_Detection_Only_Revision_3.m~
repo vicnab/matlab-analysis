@@ -6,7 +6,7 @@ if(ispc)
 elseif(ismac)
     passdir = uigetdir('/Users/Ben/Dropbox/Cell Phone Project/Images/11_05_2010/');
 else
-    disp('Not a mac or a PC WTF')
+    disp('Not a mac or a PC ?????')
 end
 runname = passdir(end-4:end);
 tb1 = [2 3 4];

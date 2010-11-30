@@ -1,8 +1,17 @@
-function data_cell = AnalyzeBeads(direct, numtest, tb1,cb1,tb2,cb2,tb3,cb3,tb4,cb4,tb5,cb5);
+function data_cell = Single_Color(plothandle, test, cont);
 %% This section of code determines the infromation about the number of
 %% images, the image with the highest exposure (used to find the beads) and
 %% all the imge filenames and corresponding exposure
+[numtest samples] = size(cont);
 curdirect = pwd;
+if(ispc)
+    direct = uigetdir('C:\Users\Ben\Documents\My Dropbox\Cell Phone Project\Images\10_22_2010');
+
+elseif(ismac)
+    direct = uigetdir('/Users/Ben/Dropbox/Cell Phone Project/Images/11_05_2010/');
+else
+    disp('Not a mac or a PC ?????')
+end
 if(isempty(regexp(path,direct)))
     path(path,direct);
 end
@@ -78,7 +87,7 @@ for r =1:4
 end
 centers = [row1;row2;row3;row4];
 pracrad = mean(cirrad)*.8;
-figure(1); imagesc(calimg); colormap('gray'); axis image;
+axes(plothandle); imagesc(calimg); colormap('gray'); axis image;
 xlabel('X Pixels');
 ylabel('Y Pixels');
 title(sprintf('Exposure %2.0f ms', cal_exp));
@@ -112,11 +121,12 @@ hold off;
 clear calimg;
 
 for i = 1:num_image
-    figure(1)
+   % figure(1)
+   axes(plothandle);
     centers = centers_cell{i};
     img = imread(imginfo(i).name);
     img = img(:,:,1:3);
-    figure(1); imagesc(img);  axis image;
+    imagesc(img);  axis image;
     xlabel('X Pixels');
     ylabel('Y Pixels');
     title(sprintf('Exposure %2.0f ms', imginfo(i).exp));
@@ -332,11 +342,11 @@ for i = 1:num_image
    
 end
 for i = 1:num_image
-    figure(1)
+    axes(plothandle);
     centers = centers_cell{i};
     img = imread(imginfo(i).name);
     img = img(:,:,1:3);
-    figure(1); imagesc(img);  axis image;
+    axes(plothandle); imagesc(img);  axis image;
     xlabel('X Pixels');
     ylabel('Y Pixels');
     title(sprintf('Exposure %2.0f ms', imginfo(i).exp));
@@ -371,27 +381,31 @@ for j = 1:num_image;
         contname = sprintf('cb%1.0f', condition);
         data_cell{counter,1} = sprintf('Test %1.0f', condition);
         data_cell{counter,2} = [data_cell{counter,2} imginfo(j).exp];
-        data_cell{counter,3} = [data_cell{counter,3} mean(red_int(eval(testname)))];
-        data_cell{counter,4} = [data_cell{counter,4} std(red_int(eval(testname)))];
-        data_cell{counter,5} = [data_cell{counter,5} mean(green_int(eval(testname)))];
-        data_cell{counter,6} = [data_cell{counter,6} std(green_int(eval(testname)))];
-        data_cell{counter,7} = [data_cell{counter,7} mean(blue_int(eval(testname)))];
-        data_cell{counter,8} = [data_cell{counter,8} std(blue_int(eval(testname)))];
-        data_cell{counter,9} = [data_cell{counter,9} mean(gray_int(eval(testname)))];
-        data_cell{counter,10} = [data_cell{counter,10} std(gray_int(eval(testname)))];
+        data_cell{counter,3} = [data_cell{counter,3} mean(red_int(test(condition,:)))];
+        data_cell{counter,4} = [data_cell{counter,4} std(red_int(test(condition,:)))];
+        data_cell{counter,5} = [data_cell{counter,5} mean(green_int(test(condition,:)))];
+        data_cell{counter,6} = [data_cell{counter,6} std(green_int(test(condition,:)))];
+        data_cell{counter,7} = [data_cell{counter,7} mean(blue_int(test(condition,:)))];
+        data_cell{counter,8} = [data_cell{counter,8} std(blue_int(test(condition,:)))];
+        data_cell{counter,9} = [data_cell{counter,9} mean(gray_int(test(condition,:)))];
+        data_cell{counter,10} = [data_cell{counter,10} std(gray_int(test(condition,:)))];
         counter = counter+1;
         data_cell{counter,1} = sprintf('Control %1.0f', condition);
         data_cell{counter,2} = [data_cell{counter,2} imginfo(j).exp] ;
-        data_cell{counter,3} = [data_cell{counter,3} mean(red_int(eval(contname)))];
-        data_cell{counter,4} = [data_cell{counter,4} std(red_int(eval(contname)))];
-        data_cell{counter,5} = [data_cell{counter,5} mean(green_int(eval(contname)))];
-        data_cell{counter,6} = [data_cell{counter,6} std(green_int(eval(contname)))];
-        data_cell{counter,7} = [data_cell{counter,7} mean(blue_int(eval(contname)))];
-        data_cell{counter,8} = [data_cell{counter,8} std(blue_int(eval(contname)))];
-        data_cell{counter,9} = [data_cell{counter,9} mean(gray_int(eval(contname)))];
-        data_cell{counter,10} = [data_cell{counter,10} std(gray_int(eval(contname)))];
+        data_cell{counter,3} = [data_cell{counter,3} mean(red_int(cont(condition,:)))];
+        data_cell{counter,4} = [data_cell{counter,4} std(red_int(cont(condition,:)))];
+        data_cell{counter,5} = [data_cell{counter,5} mean(green_int(cont(condition,:)))];
+        data_cell{counter,6} = [data_cell{counter,6} std(green_int(cont(condition,:)))];
+        data_cell{counter,7} = [data_cell{counter,7} mean(blue_int(cont(condition,:)))];
+        data_cell{counter,8} = [data_cell{counter,8} std(blue_int(cont(condition,:)))];
+        data_cell{counter,9} = [data_cell{counter,9} mean(gray_int(cont(condition,:)))];
+        data_cell{counter,10} = [data_cell{counter,10} std(gray_int(cont(condition,:)))];
     end
 end
+runname = direct(end-4:end);
+save([direct '/' runname '.mat'], 'data_cell');
+clear data_cell;
+Single_Run_Analysis(runname, direct);
 
 
 %clear;

@@ -22,16 +22,17 @@ function varargout = gui_analysis(varargin)
 
 % Edit the above text to modify the response to help gui_analysis
 
-% Last Modified by GUIDE v2.5 20-Nov-2010 18:02:27
+% Last Modified by GUIDE v2.5 28-Nov-2010 21:35:40
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
 gui_State = struct('gui_Name',       mfilename, ...
-                   'gui_Singleton',  gui_Singleton, ...
-                   'gui_OpeningFcn', @gui_analysis_OpeningFcn, ...
-                   'gui_OutputFcn',  @gui_analysis_OutputFcn, ...
-                   'gui_LayoutFcn',  [] , ...
-                   'gui_Callback',   []);
+    'gui_Singleton',  gui_Singleton, ...
+    'gui_OpeningFcn', @gui_analysis_OpeningFcn, ...
+    'gui_OutputFcn',  @gui_analysis_OutputFcn, ...
+    'gui_LayoutFcn',  [] , ...
+    'gui_Callback',   []);
+
 if nargin && ischar(varargin{1})
     gui_State.gui_Callback = str2func(varargin{1});
 end
@@ -57,13 +58,19 @@ handles.output = hObject;
 
 % Update handles structure
 guidata(hObject, handles);
+global TestNum;
 
+set(handles.Single, 'Enable', 'Off');
+set(handles.Multiple, 'Enable', 'Off');
+set(handles.Dose, 'Enable', 'Off');
+axes(handles.axes1);
+TitleScreen = '
 % UIWAIT makes gui_analysis wait for user response (see UIRESUME)
 % uiwait(handles.figure1);
 
 
 % --- Outputs from this function are returned to the command line.
-function varargout = gui_analysis_OutputFcn(hObject, eventdata, handles) 
+function varargout = gui_analysis_OutputFcn(hObject, eventdata, handles)
 % varargout  cell array for returning output args (see VARARGOUT);
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -81,10 +88,23 @@ function TestNumSlider_Callback(hObject, eventdata, handles)
 
 % Hints: get(hObject,'Value') returns position of slider
 %        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
+global TestNum;
 TestNum = get(handles.TestNumSlider,'Value');
 %puts the slider value into the edit text component
 set(handles.TestSliderText,'String', num2str(TestNum));
+set(handles.Single, 'Enable', 'On');
 % Update handles structure
+if(get(handles.epi, 'Value') == 1 || get(handles.color, 'Value') == 1)
+    set(handles.Setup, 'String', '');
+    set(handles.Single, 'Enable', 'On');
+    set(handles.Multiple,'Enable', 'On');
+    set(handles.Dose,'Enable', 'On');
+else
+    set(handles.Setup, 'String', 'Please set imaging modality');
+    set(handles.Single, 'Enable', 'Off');
+    set(handles.Multiple,'Enable', 'Off');
+    set(handles.Dose,'Enable', 'Off');
+end
 guidata(hObject, handles);
 
 
@@ -102,26 +122,67 @@ end
 
 
 
+
+
 function TestSliderText_Callback(hObject, eventdata, handles)
 % hObject    handle to TestSliderText (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
 % Hints: get(hObject,'String') returns contents of TestSliderText as text
 %        str2double(get(hObject,'String')) returns contents of TestSliderText as a double
-TestNum = str2num(get(handles.TestSliderText, 'String'));
+global TestNum;
+TestNum = round(str2num(get(handles.TestSliderText, 'String')));
 %if user inputs something is not a number, or if the input is less than 0
 %or greater than 100, then the slider value defaults to 0
 if (isempty(TestNum) || TestNum < 1)
     set(handles.TestNumSlider,'Value',1);
     set(handles.TestSliderText,'String','1');
     TestNum = 1;
-elseif(TestNum < 1)
+    if(get(handles.epi, 'Value') == 1 || get(handles.color, 'Value') == 1)
+        set(handles.Single, 'Enable', 'On');
+        set(handles.Multiple,'Enable', 'On');
+        set(handles.Dose,'Enable', 'On');
+        set(handles.Setup, 'String', '');
+    else
+        set(handles.Single, 'Enable', 'Off');
+        set(handles.Multiple,'Enable', 'Off');
+        set(handles.Dose,'Enable', 'Off');
+        set(handles.Setup, 'String', 'Please set imaging modality');
+    end
+
 elseif(TestNum > 5)
-    
+    set(handles.TestNumSlider,'Value',5);
+    set(handles.TestSliderText,'String','5');
+    TestNum = 5;
+    if(get(handles.epi, 'Value') == 1 || get(handles.color, 'Value') == 1)
+        set(handles.Single, 'Enable', 'On');
+        set(handles.Multiple,'Enable', 'On');
+        set(handles.Dose,'Enable', 'On');
+        set(handles.Setup, 'String', '');
+    else
+        set(handles.Single, 'Enable', 'Off');
+        set(handles.Multiple,'Enable', 'Off');
+        set(handles.Dose,'Enable', 'Off');
+        set(handles.Setup, 'String', 'Please set imaging modality');
+    end
+
+
 else
+    set(handles.TestSliderText,'String',TestNum); %this is in case someone inserts a noninteger
     set(handles.TestNumSlider,'Value',TestNum);
+    if(get(handles.epi, 'Value') == 1 || get(handles.color, 'Value') == 1)
+        set(handles.Single, 'Enable', 'On');
+        set(handles.Multiple,'Enable', 'On');
+        set(handles.Dose,'Enable', 'On');
+        set(handles.Setup, 'String', '');
+    else
+        set(handles.Single, 'Enable', 'Off');
+        set(handles.Multiple,'Enable', 'Off');
+        set(handles.Dose,'Enable', 'Off');
+        set(handles.Setup, 'String', 'Please set imaging modality');
+    end
 end
+
 
 % --- Executes during object creation, after setting all properties.
 function TestSliderText_CreateFcn(hObject, eventdata, handles)
@@ -136,4 +197,171 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 
+
+
+
+% --- Executes on button press in epi.
+function epi_Callback(hObject, eventdata, handles)
+% hObject    handle to epi (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+curval = str2num(get(handles.TestSliderText, 'String'));
+if(get(handles.epi, 'Value') == 1)
+    set(handles.color, 'Value', 0)
+    
+    if(curval<=5 &curval >= 1)
+        set(handles.Single, 'Enable', 'On');
+        set(handles.Multiple,'Enable', 'On');
+        set(handles.Dose,'Enable', 'On');
+        set(handles.Setup, 'String', '');
+    else
+        set(handles.Single, 'Enable', 'Off');
+        set(handles.Multiple,'Enable', 'Off');
+        set(handles.Dose,'Enable', 'Off');
+        set(handles.Setup, 'String', 'Please set number of tests');
+    end
+else
+    set(handles.Single, 'Enable', 'Off');
+    set(handles.Multiple,'Enable', 'Off');
+    set(handles.Dose,'Enable', 'Off');
+    if(curval<=5 &curval >= 1)
+        set(handles.Setup, 'String', 'Please set imaging modality');
+    else
+        set(handles.Setup, 'String', 'Please set imaging modality and number of test conditions');
+    end
+
+
+end
+
+% Hint: get(hObject,'Value') returns toggle state of epi
+
+
+% --- Executes on button press in color.
+function color_Callback(hObject, eventdata, handles)
+    curval = str2num(get(handles.TestSliderText, 'String'));
+if(get(handles.color, 'Value') == 1)
+    set(handles.epi, 'Value', 0)
+
+    if(curval<=5 &curval >= 1)
+        set(handles.Single, 'Enable', 'On');
+        set(handles.Multiple,'Enable', 'On');
+        set(handles.Dose,'Enable', 'On');
+        set(handles.Setup, 'String', '');
+    else
+        set(handles.Single, 'Enable', 'Off');
+        set(handles.Multiple,'Enable', 'Off');
+        set(handles.Dose,'Enable', 'Off');
+        set(handles.Setup, 'String', 'Please set number of test conditions');
+    end
+else
+    set(handles.Single, 'Enable', 'Off');
+    set(handles.Multiple,'Enable', 'Off');
+    set(handles.Dose,'Enable', 'Off');
+    if(curval<=5 &curval >= 1)
+        set(handles.Setup, 'String', 'Please set imaging modality');
+    else
+        set(handles.Setup, 'String', 'Please set imaging modality and number of test conditions');
+    end
+
+end
+% hObject    handle to color (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of color
+
+
+% --- Executes on button press in Dose.
+function Dose_Callback(hObject, eventdata, handles)
+global TestNum tests conts
+
+
+% hObject    handle to Dose (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --- Executes on button press in Multiple.
+function Multiple_Callback(hObject, eventdata, handles)
+% hObject    handle to Multiple (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --- Executes on button press in Single.
+function Single_Callback(hObject, eventdata, handles)
+% hObject    handle to Single (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+function TestData()
+global TestNum tests conts
+tests = []
+conts = []
+myprompt = 'Enter beads for '
+prompttest = {};
+promptcont = {};
+for i = 1:TestNum
+    testname = sprintf('test%1.0f', i);
+    contname = sprintf('Control%1.0f', i);
+    curtestprompt = sprintf('%s %s', myprompt, testname);
+    curcontprompt = sprintf('%s %s', myprompt, contname);
+    prompttest = {prompttest{:}, curtestprompt};
+    promptcont = {promptcont{:}, curcontprompt};
+
+end
+correcttest = 0;
+while(~correcttest)
+    testinfo = inputdlg(prompttest);
+
+    isnumerror = 0;
+    isbigerror = 0;
+    for a = 1:TestNum
+        testsamp = str2num(testinfo{a});
+        if (isempty(testsamp))
+            isnumerror = isnumerror + 1;
+        elseif (max(testsamp) > 20)
+            isbigerror = isbigerror +1
+        end
+    end
+    if(isnumerror > 0)
+        uiwait(warndlg('Bead input is in wrong format, contains nonumeric data', '**Nonnumeric Input**'));
+    end
+    if(isbigerror>0)
+        uiwait(warndlg('Bead input contains numbers exceeding array size', '**Bead Index Eceeds Array Size**'))
+    end
+    if(isbigerror == 0 & isnumerror == 0)
+        correcttest =1;
+    end
+end
+correcttest = 0;
+while(~correcttest)
+    continfo = inputdlg(promptcont);
+
+    isnumerror = 0;
+    isbigerror = 0;
+    for a = 1:TestNum
+        contsamp = str2num(continfo{a});
+        if (isempty(contsamp))
+            isnumerror = isnumerror + 1;
+        elseif (max(contsamp) > 20)
+            isbigerror = isbigerror +1
+        end
+    end
+    if(isnumerror > 0)
+        uiwait(warndlg('Bead input is in wrong format, contains nonumeric data', '**Nonnumeric Input**'));
+    end
+    if(isbigerror>0)
+        uiwait(warndlg('Bead input contains numbers exceeding array size', '**Bead Index Eceeds Array Size**'))
+    end
+    if(isbigerror == 0 & isnumerror == 0)
+        correcttest =1;
+    end
+end
+
+
+for a = 1:TestNum
+    tests(a,:) = str2num(testinfo{a});
+    conts(a,:) = str2num(continfo{a});
+end
 
