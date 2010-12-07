@@ -1,4 +1,4 @@
-function Single_Run_Analysis(runname, rundir) 
+function Single_Run_Analysis(handles, runname, rundir) 
 % if(ispc)
 %     passdir = 'C:\Users\Ben\Documents\My Dropbox\Cell Phone Project\Images\10_22_2010\Run 2' ;
 % elseif(ismac)
@@ -6,6 +6,11 @@ function Single_Run_Analysis(runname, rundir)
 % else
 %     disp('Not a mac or a PC WTF')
 % end
+set(handles.axes3, 'Visible', 'Off');
+cla(handles.axes3);
+set(handles.pan, 'Visible', 'On');
+%set(handles.axes4, 'Visible', 'On');
+colormap(jet);
 run = importdata([rundir '/' runname '.mat'], 'run');
 
 fid = fopen([rundir '/' runname '.txt'], 'w');
@@ -19,9 +24,11 @@ for k = 1:length(run{2,2}) %first element that is data
         end
     end
 end
+numtest = (conditions - 1)/2;
 fclose(fid);
 mycolors = [135.0000/255         0         0;
     0.4392    0.4392    0.4392];
+%axes(plothandle);
   
 for l = 1:length(run{2,2})
    % figure('visible', 'off');
@@ -33,8 +40,11 @@ for l = 1:length(run{2,2})
         for m = 2:2:conditions
             meanmat = [meanmat; run{m,k}(l), run{m+1,k}(l)] ;
             stdmat = [stdmat; run{m,k+1}(l), run{m+1,k+1}(l)];
+            
             xlab = [xlab run{m,1}];
         end
+        %meanmat = meanmat(1,:);
+        %stdmat = stdmat(1, :);
         meanvec = meanmat';
         stdvec = stdmat';
         meanvec = meanvec(:);
@@ -43,11 +53,23 @@ for l = 1:length(run{2,2})
             xval(refind) = ceil(refind/2) - .15;
             xval(refind+1) = ceil(refind/2)+.15;
         end
+         
+          
         subnum = floor(k/2);
-        subplot(2,2,subnum);
-        bar(meanmat);
-        hold on;
-        errorbar(xval,meanvec,stdvec, '*')
+       %axes(handles.axes4)
+        subplot(2,2,subnum,'Parent', handles.pan);
+       
+      
+       
+         if(numtest == 1)
+            meanmat = [meanmat; [0 0]];
+         end
+         
+          h = bar(meanmat);
+           
+            hold on;
+      errorbar(xval,meanvec,stdvec, 'ko')
+        hold off;
         %handles = barweb(barvalues, errors, width, groupnames, bw_title, bw_xlabel, bw_ylabel, bw_colormap, gridstatus, bw_legend, error_sides, legend_type)
         stringtitle = run{1,k};
         pat = '(?<color>\w+)\s+(?<variable>\w+)\s+(?<meanstd>\w+)';
@@ -59,8 +81,13 @@ for l = 1:length(run{2,2})
        % toc
         %set(handles.legend, 'Position', [.6 .39 .04 .04]);
         a = axis;
-        a(4) = 255;
-        axis(a); %scales y a little bigger than default to make room for the legend!
+        xmin = .5;
+        xmax = numtest + .5;
+        ymin = 0;
+        ymax = 300;
+        axis([xmin xmax ymin ymax]);
+        %scales y a little bigger than default to make room for the legend!
+        set(gca,'XTick', [1:numtest]);
         set(gca, 'XTickLabel', xlab)
 
         
@@ -77,6 +104,10 @@ for l = 1:length(run{2,2})
         mkdir(chkdir);
     end
     saveas (gcf, sprintf('%s/%s/%s_%2.0fms.fig',rundir, 'Line_Method',runname,  run{2,2}(l)));
-    
+    pause(.5);
   
 end
+set(handles.pan, 'Visible', 'Off');
+%set(handles.axes4, 'Visible', 'Off');
+set(handles.axes3, 'Visible', 'On');
+axes(handles.axes3);

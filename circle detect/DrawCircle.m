@@ -1,4 +1,4 @@
-function DrawCircle(x, y, r, nseg, S)
+function DrawCircle(x, y, r, nseg, S,A)
 % Draw a circle on the current figure using ploylines
 %
 %  DrawCircle(x, y, r, nseg, S)
@@ -21,10 +21,16 @@ function DrawCircle(x, y, r, nseg, S)
 %           University of Maryland, College Park, Maryland 20742, USA
 %           pengtao@glue.umd.edu
 %  Version: alpha       Revision: Jan. 10, 2006
-
+if(nargin < 5)
+    S = '-r';
+    A = 1;
+end
+if(nargin < 6)
+    A = 1;
+end
 
 theta = 0 : (2 * pi / nseg) : (2 * pi);
 pline_x = r * cos(theta) + x;
 pline_y = r * sin(theta) + y;
 
-plot(pline_x, pline_y, S, 'LineWidth', 1);
+plot(pline_x, pline_y, S, 'LineWidth', A);

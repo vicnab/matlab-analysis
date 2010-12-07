@@ -63,8 +63,8 @@ global TestNum;
 set(handles.Single, 'Enable', 'Off');
 set(handles.Multiple, 'Enable', 'Off');
 set(handles.Dose, 'Enable', 'Off');
-axes(handles.plotter);
-TitleScreen = imread('Picture141.png');
+axes(handles.axes3);
+TitleScreen = imread('titlepage.png');
 imshow(TitleScreen);
 % UIWAIT makes gui_analysis wait for user response (see UIRESUME)
 % uiwait(handles.figure1);
@@ -301,9 +301,15 @@ function Single_Callback(hObject, eventdata, handles)
 global TestNum tests conts
 [tests conts]  = BeadData(TestNum);
 if(get(handles.color, 'Value'))
-    Single_Color(handles.plotter, tests, conts)
+    [runname direct] = Single_Color(handles.axes3, tests, conts);
+    Single_Run_Analysis_Color(handles, runname,direct)  ; 
+    pause();
+    Success(hObject, eventdata, handles)
 elseif(get(handles.epi, 'Value'))
-    Single_Epi(tests, conts);
+    [runname direct] = Single_Epi(handles.axes3, tests, conts);
+    Single_Run_Analysis_Color(handles, runname, direct);
+    pause();
+     Success(hObject, eventdata, handles);
 end
 
 function [tests conts] = BeadData(TestNum)
@@ -375,4 +381,14 @@ for a = 1:TestNum
     tests(a,:) = str2num(testinfo{a});
     conts(a,:) = str2num(continfo{a});
 end
+
+function Success(hObject, eventdata, handles)
+set(handles.pan, 'Visible', 'Off');
+%set(handles.axes4, 'Visible', 'Off');
+set(handles.axes3, 'Visible', 'On');
+axes(handles.axes3);
+AnalysisComplete = imread('analysiscomplete.png');
+imshow(AnalysisComplete);
+
+
 

@@ -1,4 +1,4 @@
-function data_cell = Single_Color(plothandle, test, cont);
+function [runname direct] = Single_Color(plothandle, test, cont);
 %% This section of code determines the infromation about the number of
 %% images, the image with the highest exposure (used to find the beads) and
 %% all the imge filenames and corresponding exposure
@@ -375,10 +375,10 @@ for j = 1:num_image;
     grayimg = rgb2gray(img);
     [m n unused] = size(img);
   
-    [maximared red_int]=line_prof_averages_and_maxima(centers,length(centers), 8,pracrad, double(img(:,:,1)));
-    [maximagreen green_int]=line_prof_averages_and_maxima(centers,length(centers), 8,pracrad, double(img(:,:,2))); 
-    [maximablue blue_int]=line_prof_averages_and_maxima(centers,length(centers), 8, pracrad,double(img(:,:,3)));
-    [maximagray gray_int]=line_prof_averages_and_maxima(centers,length(centers), 8, pracrad, double(grayimg)); 
+    [maximared red_int]=line_prof_averages_and_maxima_color(centers,length(centers), 8,pracrad, double(img(:,:,1)));
+    [maximagreen green_int]=line_prof_averages_and_maxima_color(centers,length(centers), 8,pracrad, double(img(:,:,2))); 
+    [maximablue blue_int]=line_prof_averages_and_maxima_color(centers,length(centers), 8, pracrad,double(img(:,:,3)));
+    [maximagray gray_int]=line_prof_averages_and_maxima_color(centers,length(centers), 8, pracrad, double(grayimg)); 
 
     counter = 1;
     for condition = 1:numtest
@@ -416,7 +416,7 @@ elseif(ispc)
    save([direct '\' runname '.mat'], 'data_cell');
 end
 clear data_cell;
-Single_Run_Analysis(runname, direct);
+
 
 
 %clear;

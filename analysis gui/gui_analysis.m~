@@ -63,8 +63,9 @@ global TestNum;
 set(handles.Single, 'Enable', 'Off');
 set(handles.Multiple, 'Enable', 'Off');
 set(handles.Dose, 'Enable', 'Off');
-axes(handles.axes1);
-TitleScreen = '
+axes(handles.plotter);
+TitleScreen = imread('Picture141.png');
+imshow(TitleScreen);
 % UIWAIT makes gui_analysis wait for user response (see UIRESUME)
 % uiwait(handles.figure1);
 
@@ -274,6 +275,7 @@ end
 % --- Executes on button press in Dose.
 function Dose_Callback(hObject, eventdata, handles)
 global TestNum tests conts
+[tests conts]  = BeadData(TestNum);
 
 
 % hObject    handle to Dose (see GCBO)
@@ -287,18 +289,28 @@ function Multiple_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+global TestNum tests conts
+[tests conts]  = BeadData(TestNum);
+
 
 % --- Executes on button press in Single.
 function Single_Callback(hObject, eventdata, handles)
 % hObject    handle to Single (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
-function TestData()
 global TestNum tests conts
-tests = []
-conts = []
-myprompt = 'Enter beads for '
+[tests conts]  = BeadData(TestNum);
+if(get(handles.color, 'Value'))
+    [runname direct] = Single_Color(handles.plotter, tests, conts);
+    Single
+elseif(get(handles.epi, 'Value'))
+    Single_Epi(handles.plotter, tests, conts);
+end
+
+function [tests conts] = BeadData(TestNum)
+tests = [];
+conts = [];
+myprompt = 'Enter beads for ';
 prompttest = {};
 promptcont = {};
 for i = 1:TestNum
