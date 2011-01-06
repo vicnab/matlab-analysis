@@ -184,9 +184,7 @@ if(~b2) %b1 will exist because generated in previous step, need not account for 
         end
         row = [row(1,:); bead2; row(2:end,:)];
         b2=1;
-    else
-        disp('how is there no B1 - must be an error from Ben talk to him');
-    end
+      end
 end
 if(~b3)
     if(b5 & b1)

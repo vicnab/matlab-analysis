@@ -178,7 +178,7 @@ for b = 1:num_conc
         images{c} = conc_cell(c,b);
     end
 
-    everything{b} = Dose_Fluor_Analysis(plothandle, direct, test, cont, images, exp_vec, conc_vec, cal_exp, num_test, units);
+    everything{b} = Dose_Fluor_Analysis(plothandle, direct, test, cont, images, exp_vec, conc_vec(b), cal_exp, num_test, units);
 end
 
 write_data_create_dose_response_function(handles, direct, num_test, num_exp, num_conc, everything, exp_vec, conc_vec);

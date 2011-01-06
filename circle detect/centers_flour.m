@@ -13,12 +13,16 @@ function centers = centers_flour(calimg)
          todelete = [todelete ; i];
      end
  end
- centers = removerows(centers,todelete);
+ if(strcmp(version('-release'), '2010b'))
+   centers = removerows(centers,'ind', todelete);  
+ else
+    centers = removerows(centers,todelete);
+ end
  miny = min(centers(:,2));
  maxy = max(centers(:,2));
  ydist = (maxy - miny)/3;
- row1 = centers(find(centers(:,2)<1.1*miny),:);
- row2 = centers(find(centers(:,2)<1.1*(miny+ydist) & centers(:,2) > 1.1 * miny),:);
+ row1 = centers(find(centers(:,2)<1.15*miny),:);
+ row2 = centers(find(centers(:,2)<1.1*(miny+ydist) & centers(:,2) > 1.15 * miny),:);
  row3 = centers(find(centers(:,2)<1.1*(miny+2*ydist) & centers(:,2) > 1.1 * (miny+1*ydist)),:);
  row4 = centers(find(centers(:,2)<1.1*(miny+3*ydist) & centers(:,2) > 1.1 * (miny+2*ydist)),:);
 

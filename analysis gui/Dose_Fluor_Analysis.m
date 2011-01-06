@@ -1,6 +1,7 @@
-function [data_cell] = Dose_Flour_Analysis(plothandle, direct, test, cont, images, exp_vec, conc_vec, cal_exp, num_test, units);
+function [data_cell] = Dose_Flour_Analysis(plothandle, direct, test, cont, images, exp_vec, conc, cal_exp, num_test, units);
 
 num_exp = length(exp_vec);
+num_image = num_exp;
 calfile = images{find(exp_vec == cal_exp)};
 calimg = imread(calfile{:});
 centers = centers_flour(calimg(:,:,2));
@@ -19,7 +20,7 @@ for i = 1:num_exp
     imagesc(img);  axis image;
     xlabel('X Pixels');
     ylabel('Y Pixels');
-    title(sprintf('Exposure %2.0f ms, concentration %3.2f %s', exp_vec(i), conc_vec(i), units));
+    title(sprintf('Exposure %2.0f ms, concentration %3.2f %s', exp_vec(i), conc, units));
     hold on;
     %plot(centers(:,1), centers(:,2), 'g+');
     for k = 1 : size(centers, 1),
@@ -133,7 +134,7 @@ for i = 1:num_exp
                         imagesc(img);  axis image;
                         xlabel('X Pixels');
                         ylabel('Y Pixels');
-                        title(sprintf('Exposure %2.0f ms, concentration %3.2f %s', exp_vec(i), conc_vec(i), units));
+                        title(sprintf('Exposure %2.0f ms, concentration %3.2f %s', exp_vec(i), conc, units));
                         
                         for k = 1 : size(centerswithdeletion, 1),
                             DrawCircle(centerswithdeletion(k,1), centerswithdeletion(k,2), centers(k,3), 32, 'b-', 2);
@@ -152,7 +153,7 @@ for i = 1:num_exp
                         imagesc(img);  axis image;
                         xlabel('X Pixels');
                         ylabel('Y Pixels');
-                        title(sprintf('Exposure %2.0f ms, concentration %3.2f %s', exp_vec(i), conc_vec(i), units));
+                        title(sprintf('Exposure %2.0f ms, concentration %3.2f %s', exp_vec(i), conc, units));
                         hold on;
                         for k = 1 : size(centers, 1),
                             DrawCircle(centers(k,1), centers(k,2), centers(k,3), 32, 'b-', 2);
@@ -201,7 +202,7 @@ for i = 1:num_exp
                 imagesc(img);  axis image;
                 xlabel('X Pixels');
                 ylabel('Y Pixels');
-                title(sprintf('Exposure %2.0f ms, concentration %3.2f %s', exp_vec(i), conc_vec(i), units));
+                title(sprintf('Exposure %2.0f ms, concentration %3.2f %s', exp_vec(i), conc, units));
                 hold on;
                 for k = 1 : size(centers, 1),
                     DrawCircle(centers(k,1), centers(k,2), centers(k,3), 32, 'b-', 2);
@@ -239,11 +240,10 @@ for i = 1:num_exp
     imagesc(img);  axis image;
     xlabel('X Pixels');
     ylabel('Y Pixels');
-    title(sprintf('Exposure %2.0f ms, concentration %3.2f %s', exp_vec(i), conc_vec(i), units));
+    title(sprintf('Exposure %2.0f ms, concentration %3.2f %s', exp_vec(i), conc, units));
     hold on;
     for k = 1 : size(centers, 1),
         DrawCircle(centers(k,1), centers(k,2), centers(k,3), 32, 'b-', 2);
-        
     end
     hold off;
     pause(.5);
