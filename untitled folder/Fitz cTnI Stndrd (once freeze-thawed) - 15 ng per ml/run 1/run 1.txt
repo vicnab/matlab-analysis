@@ -1,0 +1,4 @@
+Condition, Exposure, Red Intensity Mean, Red Intensity Std, Green Intensity Mean, Green Intensity Std, Blue Intensity Mean, Blue Intensity Std, Gray Intensity Mean, Gray Intensity Std 
+Test 1, 380.00, 17.76, 0.00, 255.00, 0.00, 33.00, 0.00, 156.84, 0.00
+Control 1, 380.00, 12.28, 0.00, 229.68, 0.00, 30.64, 0.00, 141.12, 0.00
+

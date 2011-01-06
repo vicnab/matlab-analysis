@@ -22,7 +22,7 @@ function varargout = gui_analysis(varargin)
 
 % Edit the above text to modify the response to help gui_analysis
 
-% Last Modified by GUIDE v2.5 28-Nov-2010 21:35:40
+% Last Modified by GUIDE v2.5 05-Jan-2011 23:46:30
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -276,6 +276,16 @@ end
 function Dose_Callback(hObject, eventdata, handles)
 global TestNum tests conts
 [tests conts]  = BeadData(TestNum);
+if(get(handles.color, 'Value'))
+%    [runname direct] = Single_Color(handles.axes3, tests, conts);
+ %   Single_Run_Analysis_Color(handles, runname,direct)  ; 
+  %  pause();
+   % Success(hObject, eventdata, handles) fill this in
+elseif(get(handles.epi, 'Value'))
+    Dose_Fluor(handles.axes3,handles, tests,conts)
+    pause();
+     Success(hObject, eventdata, handles);
+end
 
 
 % hObject    handle to Dose (see GCBO)
@@ -390,5 +400,11 @@ axes(handles.axes3);
 AnalysisComplete = imread('analysiscomplete.png');
 imshow(AnalysisComplete);
 
+
+% --- Executes when figure1 is resized.
+function figure1_ResizeFcn(hObject, eventdata, handles)
+% hObject    handle to figure1 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
 
 

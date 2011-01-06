@@ -67,29 +67,29 @@ dose_response(xlp,ylp);
 axis([.1 100 0 70]);
 suplabel('Luanyi TNF-\alpha data, Line Profile', 't');
 pause;
-subplot(2,1,1)
-c = imread('jietheoretical.png');
-imagesc(c);
-a = gca;
-set(a, 'YTickLabel', []);
-set(a, 'XTickLabel', []);
-subplot(2,1,2);
-xtheor = [100
-10
-1
-0.1
-0.01
-0.001];
-ytheor = [973.145
-973.145
-754.913
-196.514
-26.366
-2.912];
-dose_response(xtheor,ytheor);
-axis([10^(-4) 10^3 0 1200]);
-suplabel('Jie CFD Data', 't');
-pause;
+% subplot(2,1,1)
+% c = imread('jietheoretical.png');
+% imagesc(c);
+% a = gca;
+% set(a, 'YTickLabel', []);
+% set(a, 'XTickLabel', []);
+% subplot(2,1,2);
+% xtheor = [100
+% 10
+% 1
+% 0.1
+% 0.01
+% 0.001];
+% ytheor = [973.145
+% 973.145
+% 754.913
+% 196.514
+% 26.366
+% 2.912];
+% dose_response(xtheor,ytheor);
+% axis([10^(-4) 10^3 0 1200]);
+% suplabel('Jie CFD Data', 't');
+
 subplot(2,1,1)
 c = imread('sobecoke.png');
 imagesc(c);

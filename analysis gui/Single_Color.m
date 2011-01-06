@@ -40,7 +40,13 @@ for a = 1:length(direct_info)
             if(~isempty(regexp(direct_info(a).name, '[0-9]')))  %% find images only with exposure time listed
                 if(~isempty(regexp(direct_info(a).name, 'ms'))) %% to make sure it's an image file
                     imginfo(num_image+1).name = direct_info(a).name; %%saves file name
-                    expindex = regexp(direct_info(a).name, '[0-9]'); %%finds exposure time
+                    [msindexbeg msindexend] = regexp(direct_info(a).name, 'ms');
+                    msindexbeg = msindexbeg - 6;
+                    if(msindexbeg<1)
+                        msindexbeg = 1;
+                    end
+                    subname = direct_info(a).name(msindexbeg:msindexend);
+                    expindex = regexp(subname, '[0-9]') + msindexbeg-1; %%finds exposure time
                     exposure = str2num(direct_info(a).name(expindex));
                     imginfo(num_image+1).exp = exposure;  %%records exposure time
                     num_image = num_image + 1; %%indexes number of images

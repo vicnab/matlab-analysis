@@ -87,5 +87,26 @@ ytheor = [973.145
 26.366
 2.912];
 dose_response(xtheor,ytheor);
-%axis([.1 100 0 70]);
-suplabel('Luanyi TNF-\alpha data, Line Profile', 't');
+axis([10^(-4) 10^3 0 1200]);
+suplabel('Jie CFD Data', 't');
+pause;
+subplot(2,1,1)
+c = imread('sobecoke.png');
+imagesc(c);
+a = gca;
+set(a, 'YTickLabel', []);
+set(a, 'XTickLabel', []);
+subplot(2,1,2);
+xtheor = [10000
+1000
+100
+10
+1];
+ytheor = [64.852
+106.6387
+150.9831
+156.627
+155.7086];
+dose_response(xtheor,ytheor);
+axis([10^(-4) 10^3 0 1200]);
+suplabel('Sobe Competition Data', 't');

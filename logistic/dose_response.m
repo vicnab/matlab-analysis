@@ -12,19 +12,27 @@ function [beta_est mse conc_graph intensity_graph] = dose_response_log4param(con
 if(nargin <2)
     error('Must enter dependent and independent vraiables', 'MESSAGE')
 elseif (nargin == 2)
-    beta3 = conc(find(intensity == min(intensity))); 
-    beta0 = [1 max(intensity) beta3 -1]; %parameter guess, negative beta0(4) necessarry for noncompetetive fitting
+   [a order] = sort(conc);
+   intensity = intensity(order);
+   conc = conc(order);
+   beta1 = intensity(1);
+   beta2 = intensity(end) - beta1;
+   beta3 = 0; %why?
+   beta4 = (intensity(end) - intensity(1))/(conc(end) - conc(1));
+   if(beta4<0)
+       competition = 1;
+   else
+       competition  = 0;
+   end
+    beta0 = [beta1 beta2 beta3 -beta4]; %parameter guess, negative beta0(4) necessarry for noncompetetive fitting
 end
 options = statset('MaxIter', 100000);
 try
     [beta_est,r,J,COVB,mse] = nlinfit(conc,intensity,@log4param, beta0, options);
-    competition = 0; 
+
 catch ME
     if (nargin == 2)
-            beta3 = conc(find(intensity == max(intensity)));
-        beta0 = [min(intensity) max(intensity) beta3 1];
-        [beta_est,r,J,COVB,mse] = nlinfit(conc,intensity,@log4param, beta0, options); % parameter guess, positive beta0(4) necessarry for noncompetetive fitting
-        competition = 1;
+     disp('problem, getting NAN/inf values with fit, talk to Ben')
     else
         disp('supplied beta0 is not allowing for appropriate curve fitting')
         rethrow(ME); %beta0 given didn't work, throw an error 
@@ -35,15 +43,15 @@ conc_low = log10(min(conc))-1;
 conc_high = log10(max(conc))+1;
 conc_graph = logspace(conc_low,conc_high,1000);
 intensity_graph = log4param(beta_est, conc_graph);
-semilogx(conc,intensity,'*');
+semilogx(conc,intensity,'r*', 'MarkerSize', 7);
 hold on
-semilogx(conc_graph,intensity_graph);
+semilogx(conc_graph,intensity_graph, 'LineWidth', 1);
 hold off
-xlabel('Log(concentration)');
-ylabel('Intensity');
+xlabel('Log(concentration)', 'FontSize', 14);
+ylabel('Intensity', 'FontSize', 14);
 if(competition)
-    title('Sigmoidal fit to competetive dose response curve');
+    title('Sigmoidal fit to competetive dose response curve', 'FontSize', 14);
 else
-    title('Sigmoidal fit to noncompetetive dose response curve');
+    title('Sigmoidal fit to noncompetetive dose response curve', 'FontSize', 14);
 end
     
