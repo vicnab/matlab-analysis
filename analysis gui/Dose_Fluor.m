@@ -18,37 +18,14 @@ function [runname direct] = Dose_Fluor(plothandle,handles, test, cont);
 [num_test samples] = size(test);
 curdirect = pwd;
 if(ispc)
-   % direct = uigetdir('C:\Users\Benjamingrantdu\Documents\My Dropbox\Cell Phone Project\Images\10_22_2010');
-    circlepath = 'C:\Users\Benjamingrantdu\matlab-analysis\circle detect';
-    AnalysisPath = 'C:\Users\Benjamingrantdu\matlab-analysis\Analysis_Methods\Line_Profile';
-    GuiPath = 'C:\Users\Benjamingrantdu\matlab-analysis\analysis gui';
-    LogPath = 'C:\Users\Benjamingrantdu\matlab-analysis\logistic';
-
+    direct = uigetdir('C:\Users\Benjamingrantdu\Documents\My Dropbox\Cell Phone Project\Images\10_22_2010');
 elseif(ismac)
-    %direct = uigetdir('/Users/Ben/Dropbox/Cell Phone Project/luanyi data/Images for Ben/Dose Response/Fitz cTnI Stndrd (once freeze-thawed) - 15 ng per ml/');
-    circlepath = '/Users/Ben/matlab-analysis/circle detect';
-    AnalysisPath = '/Users/Ben/matlab-analysis/Analysis_Methods/Line_Profile';
-    GuiPath = '/Users/Ben/matlab-analysis/analysis gui';
-    LogPath = '/Users/Ben/matlab-analysis/logistic';
+    direct = uigetdir('/Users/Ben/Dropbox/Cell Phone Project/luanyi data/Images for Ben/Dose Response/Fitz cTnI Stndrd (once freeze-thawed) - 15 ng per ml/');
 else
     disp('Not a mac or a PC ?????')
 end
-direct = '/Users/Ben/matlab-analysis/untitled folder';
-if(isempty(regexp(path,direct)))
-    path(path,direct);
-end
-if(isempty(regexp(path,circlepath)))
-    path(path, circlepath);
-end
-if(isempty(regexp(path,AnalysisPath)))
-    path(path, AnalysisPath)
-end
-if(isempty(regexp(path,GuiPath)))
-    path(path, GuiPath)
-end
-if(isempty(regexp(path,LogPath)))
-    path(path, LogPath)
-end
+
+
 
 cd(direct);
 direct_info = dir;
@@ -201,7 +178,7 @@ for b = 1:num_conc
         images{c} = conc_cell(c,b);
     end
 
-    everything{b} = Dose_Fluor_Analysis(plothandle, direct, test, cont, images, exp_vec, cal_exp, num_test);
+    everything{b} = Dose_Fluor_Analysis(plothandle, direct, test, cont, images, exp_vec, conc_vec, cal_exp, num_test, units);
 end
 
 write_data_create_dose_response_function(handles, direct, num_test, num_exp, num_conc, everything, exp_vec, conc_vec);

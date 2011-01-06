@@ -83,7 +83,7 @@ for i = 1:num_exp
             filesave = sprintf('%s/%s/DoseResponse_%s_%3.0fms',direct, 'Line_Method',everything{1}{j,1}, everything{1}{j,2}(i))
             exportcmd = sprintf('%s ''%s'' %s %s %s %s', 'export_fig', filesave, '-tif', '-nocrop', '-q105');
 %            eval(exportcmd);
-            pause();
+            pause(1);
         end
     end
     fprintf(fid, '\n');

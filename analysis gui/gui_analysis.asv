@@ -71,30 +71,6 @@ cd ..;
 homepath = pwd;
 cd(curdir);
 if(ispc)
-    circlepath = [homepath '\circle detect'];
-    AnalysisPath = [homepath '\Analysis_Methods\Line_Profile\'];
-    GuiPath = [homepath '\analysis gui'];
-    LogPath = [homepath '\logistic'];
-end
-if(ismac)
-    circlepath = [homepath '/circle detect'];
-    AnalysisPath = [homepath '/Analysis_Methods/Line_Profile'];
-    GuiPath = [homepath '/analysis gui'];
-    LogPath = [homepath '/logistic'];
-end
-
-if(isempty(regexp(path,circlepath)))
-    path(path, circlepath);
-end
-if(isempty(regexp(path,AnalysisPath)))
-    path(path, AnalysisPath)
-end
-if(isempty(regexp(path,GuiPath)))
-    path(path, GuiPath)
-end
-if(isempty(regexp(path,LogPath)))
-    path(path, LogPath)
-end
 % UIWAIT makes gui_analysis wait for user response (see UIRESUME)
 % uiwait(handles.figure1);
 
@@ -312,6 +288,7 @@ if(get(handles.color, 'Value'))
    % Success(hObject, eventdata, handles) fill this in
 elseif(get(handles.epi, 'Value'))
     Dose_Fluor(handles.axes3,handles, tests,conts)
+    pause();
      Success(hObject, eventdata, handles);
 end
 
