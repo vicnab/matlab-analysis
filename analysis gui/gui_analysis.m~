@@ -22,7 +22,7 @@ function varargout = gui_analysis(varargin)
 
 % Edit the above text to modify the response to help gui_analysis
 
-% Last Modified by GUIDE v2.5 28-Nov-2010 21:35:40
+% Last Modified by GUIDE v2.5 05-Jan-2011 23:46:30
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -63,9 +63,38 @@ global TestNum;
 set(handles.Single, 'Enable', 'Off');
 set(handles.Multiple, 'Enable', 'Off');
 set(handles.Dose, 'Enable', 'Off');
-axes(handles.plotter);
-TitleScreen = imread('Picture141.png');
+axes(handles.axes3);
+TitleScreen = imread('titlepage.png');
 imshow(TitleScreen);
+curdir = pwd;
+cd ..;
+homepath = pwd;
+cd(curdir);
+if(ispc)
+    circlepath = [homepath '\circle detect'];
+    AnalysisPath = [homepath '\Analysis_Methods\Line_Profile\'];
+    GuiPath = [homepath '\analysis gui'];
+    LogPath = [homepath '\logistic'];
+end
+if(ismac)
+    circlepath = [homepath '/circle detect'];
+    AnalysisPath = [homepath '/Analysis_Methods/Line_Profile'];
+    GuiPath = [homepath '/analysis gui'];
+    LogPath = [homepath '/logistic'];
+end
+
+if(isempty(regexp(path,circlepath)))
+    path(path, circlepath);
+end
+if(isempty(regexp(path,AnalysisPath)))
+    path(path, AnalysisPath)
+end
+if(isempty(regexp(path,GuiPath)))
+    path(path, GuiPath)
+end
+if(isempty(regexp(path,LogPath)))
+    path(path, LogPath)
+end
 % UIWAIT makes gui_analysis wait for user response (see UIRESUME)
 % uiwait(handles.figure1);
 
@@ -276,6 +305,15 @@ end
 function Dose_Callback(hObject, eventdata, handles)
 global TestNum tests conts
 [tests conts]  = BeadData(TestNum);
+if(get(handles.color, 'Value'))
+%    [runname direct] = Single_Color(handles.axes3, tests, conts);
+ %   Single_Run_Analysis_Color(handles, runname,direct)  ; 
+  %  pause();
+   % Success(hObject, eventdata, handles) fill this in
+elseif(get(handles.epi, 'Value'))
+    Dose_Fluor(handles.axes3,handles, tests,conts)
+     Success(hObject, eventdata, handles);
+end
 
 
 % hObject    handle to Dose (see GCBO)
@@ -301,10 +339,15 @@ function Single_Callback(hObject, eventdata, handles)
 global TestNum tests conts
 [tests conts]  = BeadData(TestNum);
 if(get(handles.color, 'Value'))
-    [runname direct] = Single_Color(handles.plotter, tests, conts);
-    Single
+    [runname direct] = Single_Color(handles.axes3, tests, conts);
+    Single_Run_Analysis_Color(handles, runname,direct); 
+    pause();
+    Success(hObject, eventdata, handles)
 elseif(get(handles.epi, 'Value'))
-    Single_Epi(handles.plotter, tests, conts);
+    [runname direct] = Single_Epi(handles.axes3, tests, conts);
+    Single_Run_Analysis_Color(handles, runname, direct);
+    pause();
+     Success(hObject, eventdata, handles);
 end
 
 function [tests conts] = BeadData(TestNum)
@@ -376,4 +419,20 @@ for a = 1:TestNum
     tests(a,:) = str2num(testinfo{a});
     conts(a,:) = str2num(continfo{a});
 end
+
+function Success(hObject, eventdata, handles)
+set(handles.pan, 'Visible', 'Off');
+%set(handles.axes4, 'Visible', 'Off');
+set(handles.axes3, 'Visible', 'On');
+axes(handles.axes3);
+AnalysisComplete = imread('analysiscomplete.png');
+imshow(AnalysisComplete);
+
+
+% --- Executes when figure1 is resized.
+function figure1_ResizeFcn(hObject, eventdata, handles)
+% hObject    handle to figure1 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
 

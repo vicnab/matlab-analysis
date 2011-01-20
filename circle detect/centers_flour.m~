@@ -13,18 +13,98 @@ function centers = centers_flour(calimg)
          todelete = [todelete ; i];
      end
  end
- centers = removerows(centers,todelete);
- miny = min(centers(:,2));
- maxy = max(centers(:,2));
+ if(strcmp(version('-release'), '2010b'))
+   centers = removerows(centers,'ind', todelete);  
+ else
+    centers = removerows(centers,todelete);
+ end
+ %%to find bottom right bead and top left bead ( the two beads the
+ %%algorithm should ALWAYS be able to find, find the distance of the
+ %%centers of each bead in terms of the distance from the origin (pixel
+ %%0,0, top left).  The greatest distance is the bottomright bead, the
+ %%shortest is the top left. This allows you to determine topleft and
+ %%bottomright regardless of the slant of the image
+ distance = centers(:,1).^2 + centers(:,2).^2;
+ topleft  = centers(find(distance == min(distance)),:);
+ bottomright = centers(find(distance == max(distance)),:);
+ bottomright(2) = bottomright(2) +5;
+ a = [ 1 0]; % x unit vector
+ xdiag = bottomright(1) - topleft(1);
+ ydiag  = bottomright(2) - topleft(2);
+ b = [xdiag ydiag]; %vector from top left to bottom right corner
+ magb = norm(b); %norm function find magnitude of vector
+ angb = atand(ydiag/xdiag); %angle of this vector b
+ %ang = atand(4/5) - acosd(dot(a,b)/(norm(a)*norm(b)));
+ %miny = min(centers(:,2));
+ bmidx = topleft(1) + magb *cosd(angb)*.5;
+ bmidy = topleft(2) + magb *sind(angb)*.5;
+ %this part is tricky. There is a triangle formed by the center of the
+ %topleft bead, to the midpoint of vector b, to the center of topright
+ %bead. Now we know that the angle of vector b not relative to our
+ %coordinate system but relative to the chip is arctan(3/4). Thus, the
+ %angle coming out of the top right and topleft beads is arctan(3/4) =
+ %36.9. Then, the angle between vector b, and the vector pointing from
+ %midpoint of b to topright bead is 180 - 2 * arctan(3/4) = 106.3. So to
+ %find this vector, you can take the vector pointing from midpoint of B to
+ %topleft bead and rotate it 106.3 degrees. 
+ 
+ 
+ %vector pointing from midpoint, lets call it vector c
+ c = [topleft(1) - bmidx; topleft(2) - bmidy];
+ %create rotation matrix using form R(theta) = [cos(theta) -sin(theta);
+ %sin(theta) cos(theta)]' 
+ thetarot = 180 - 2 * atand(3/4);
+ rotmat = [cosd(thetarot) -1*sind(thetarot); sind(thetarot) cosd(thetarot)];
+ %vector d will point from b mid to top right bead
+ d = rotmat * c;
+ magd = norm(d);
+ angd = atand(d(2)/d(1));
+ topright(1) = bmidx + magd *cosd(angd);
+ topright(2) = bmidy + magd*sind(angd);
+ 
+ %vector for row, vec R1
+ R1 = [topright(1) - topleft(1) topright(2) - topleft(2)];
+ magR1 = norm(R1);
+ angR1 = atand(R1(2)/R1(1));
+ B1 = topleft;
+ R1x = magR1/4 * [0 1 2 3 4] * cosd(angR1) + B1(1);
+ R1y = magR1/4 * [0 1 2 3 4] * sind(angR1) + 
+ B2(1) = B1(1) + magR1/4 *cosd(angR1);
+ B2(2) = B1(2) + magR1/4*sind(angR1);
+ B3(1) = B1(1) + 2*magR1/4 *cosd(angR1);
+ B3(2) = B1(2) + 2*magR1/4*sind(angR1);
+ B4(1) = B1(1) + 3*magR1/4 *cosd(angR1);
+ B4(2) = B1(2) + 3*magR1/4*sind(angR1);
+ B5 = topright;
+ imshow(calimg);
+ hold on;
+ plot(B1(1), B1(2), 'rx');
+ plot(B2(1), B2(2), 'rx');
+ plot(B3(1), B3(2), 'rx');
+ plot(B4(1), B4(2), 'rx');
+ plot(B5(1), B5(2), 'rx');
+ 
+ %vector for columms
+ C1 = [bottomright(1) - topright(1) bottomright(2) - topright(2)];
+ magC1 = norm(C1);
+ angC1 = atand(C1(2)/C1(1));
+ B6(1) = B1(1) + magC1/3 *cosd(angC1);
+ B6(2) = B1(2) + magC1/3*sind(angC1);
+ R1guessx = [B1(1) B2(1) B3(1) B4(1) B5(1)];
+ R2guessx = R1guessx + magC1/3 *cosd(angC1);
+ R1guessy = [B1(2) B2(2) B3(2) B4(2) B5(2)];
+ R2guessy = R1guessy + magC1/3 *sind(angC1);
+ plot(B5(1), B5(2), 'rx');
  ydist = (maxy - miny)/3;
- row1 = centers(find(centers(:,2)<1.1*miny),:);
- row2 = centers(find(centers(:,2)<1.1*(miny+ydist) & centers(:,2) > 1.1 * miny),:);
+ maxy = max(centers(:,2));
+ row1 = centers(find(centers(:,2)<1.15*miny),:);
+ row2 = centers(find(centers(:,2)<1.1*(miny+ydist) & centers(:,2) > 1.15 * miny),:);
  row3 = centers(find(centers(:,2)<1.1*(miny+2*ydist) & centers(:,2) > 1.1 * (miny+1*ydist)),:);
  row4 = centers(find(centers(:,2)<1.1*(miny+3*ydist) & centers(:,2) > 1.1 * (miny+2*ydist)),:);
 
-bottomright = row4(find(row4(:,1) == max(row4(:,1))),:);
+
 meanrad = mean(centers(:,3));
-topleft =  row1(find(row1(:,1) == min(row1(:,1))),:);
+
 if(length(row1)<5)
      row1 = findmissing(row1,topleft, bottomright, calimg, meanrad,0);
 end
@@ -54,14 +134,39 @@ if(rows2 < 2)
      imtemp(find(imtemp>(middle+1.5*vari))) = 255;
      [accum, circen, cirrad] = CircularHough_Grd(imtemp, [40  50], 5,50,0.1);
      circen(:,1) = circen(:,1) + xm;
-     circen(:,2) = circen(:,2) + ym
+     circen(:,2) = circen(:,2) + ym;
      centerstemp = [circen cirrad];
     [garb sorted] = sort(centerstemp(:,1));
      centerstemp = centerstemp(sorted,:);
      row2 = centerstemp;
- 
-     
+     [rows2 cols2] = size(row2);
+     if(cols2<5)
+         row2 = findmissing(row2, topleft, bottomright, calimg, meanrad,0);
+     end   
 end
+if(rows3 < 2)
+    xm = row2(1,1) - 2*row2(1,3);
+    ym = row2(1,2) + 2*row2(1,3);
+     width = row1(end,1) - row1(1,1) + 4 * row1(1,3);
+     height = 4*row1(1,3);
+     imtemp = imcrop(calimg, [xm ym width height]);
+     middle = mean(mean(imtemp));
+     imtemp(find(imtemp<.7*middle)) = middle;
+     vari = std(std(double(imtemp)));
+     imtemp(find(imtemp>(middle+1.5*vari))) = 255;
+     [accum, circen, cirrad] = CircularHough_Grd(imtemp, [40  50], 5,50,0.1);
+     circen(:,1) = circen(:,1) + xm;
+     circen(:,2) = circen(:,2) + ym;
+     centerstemp = [circen cirrad];
+    [garb sorted] = sort(centerstemp(:,1));
+     centerstemp = centerstemp(sorted,:);
+     row3 = centerstemp;
+     [rows3 cols3] = size(row2);
+     if(cols3<5)
+         row3 = findmissing(row3, topleft, bottomright, calimg, meanrad,0);
+     end   
+end
+centers = [row1; row2; row3; row4];
      
 imshow(calimg);
 hold on;

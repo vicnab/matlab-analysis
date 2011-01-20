@@ -84,7 +84,11 @@ for l = 1:length(run{2,2})
         xmin = .5;
         xmax = numtest + .5;
         ymin = 0;
-        ymax = 300;
+        if(subnum == 4)
+            ymax = 550
+        else
+            ymax = 300;
+        end
         axis([xmin xmax ymin ymax]);
         %scales y a little bigger than default to make room for the legend!
         set(gca,'XTick', [1:numtest]);

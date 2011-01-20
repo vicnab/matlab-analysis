@@ -373,7 +373,7 @@ for i = 1:num_image
     pause(.5);
 end
 data_cell = cell(2*numtest+1,10);
-data_cell(1,:) = {'Condition', 'Exposure', 'Red Intensity Mean', 'Red Intensity Std', 'Green Intensity Mean', 'Green Intensity Std', 'Blue Intensity Mean', 'Blue Intensity Std', 'Gray Intensity Mean', 'Gray Intensity Std'};
+data_cell(1,:) = {'Condition', 'Exposure', 'Red Intensity Mean', 'Red Intensity Std', 'Green Intensity Mean', 'Green Intensity Std', 'Blue Intensity Mean', 'Blue Intensity Std', 'G+B Intensity Mean', 'G+B Intensity Std'};
 tic
 for j = 1:num_image;
     centers = centers_cell{j};
@@ -384,8 +384,8 @@ for j = 1:num_image;
     [maximared red_int]=line_prof_averages_and_maxima_color(centers,length(centers), 8,pracrad, double(img(:,:,1)));
     [maximagreen green_int]=line_prof_averages_and_maxima_color(centers,length(centers), 8,pracrad, double(img(:,:,2))); 
     [maximablue blue_int]=line_prof_averages_and_maxima_color(centers,length(centers), 8, pracrad,double(img(:,:,3)));
-    [maximagray gray_int]=line_prof_averages_and_maxima_color(centers,length(centers), 8, pracrad, double(grayimg)); 
-
+%    [maximagray gray_int]=line_prof_averages_and_maxima_color(centers,length(centers), 8, pracrad, double(grayimg)); 
+    combo_int = green_int+blue_int;
     counter = 1;
     for condition = 1:numtest
         counter = counter +1;
@@ -400,8 +400,8 @@ for j = 1:num_image;
         data_cell{counter,6} = [data_cell{counter,6} std(green_int(test(condition,:)))];
         data_cell{counter,7} = [data_cell{counter,7} mean(blue_int(test(condition,:)))];
         data_cell{counter,8} = [data_cell{counter,8} std(blue_int(test(condition,:)))];
-        data_cell{counter,9} = [data_cell{counter,9} mean(gray_int(test(condition,:)))];
-        data_cell{counter,10} = [data_cell{counter,10} std(gray_int(test(condition,:)))];
+        data_cell{counter,9} = [data_cell{counter,9} mean(combo_int(test(condition,:)))];
+        data_cell{counter,10} = [data_cell{counter,10} std(combo_int(test(condition,:)))];
         counter = counter+1;
         data_cell{counter,1} = sprintf('Control %1.0f', condition);
         data_cell{counter,2} = [data_cell{counter,2} imginfo(j).exp] ;
@@ -411,8 +411,8 @@ for j = 1:num_image;
         data_cell{counter,6} = [data_cell{counter,6} std(green_int(cont(condition,:)))];
         data_cell{counter,7} = [data_cell{counter,7} mean(blue_int(cont(condition,:)))];
         data_cell{counter,8} = [data_cell{counter,8} std(blue_int(cont(condition,:)))];
-        data_cell{counter,9} = [data_cell{counter,9} mean(gray_int(cont(condition,:)))];
-        data_cell{counter,10} = [data_cell{counter,10} std(gray_int(cont(condition,:)))];
+        data_cell{counter,9} = [data_cell{counter,9} mean(combo_int(cont(condition,:)))];
+        data_cell{counter,10} = [data_cell{counter,10} std(combo_int(cont(condition,:)))];
     end
 end
 runname = direct(end-4:end);
