@@ -57,7 +57,7 @@ function gui_analysis_OpeningFcn(hObject, eventdata, handles, varargin)
 handles.output = hObject;
 
 % Update handles structure
-guidata(hObject, handles);
+
 global TestNum;
 
 set(handles.Single, 'Enable', 'Off');
@@ -95,6 +95,9 @@ end
 if(isempty(regexp(path,LogPath)))
     path(path, LogPath)
 end
+set(handles.chip_group,'SelectionChangeFcn',@chip_group_SelectionChangeFcn);
+guidata(hObject, handles);
+
 % UIWAIT makes gui_analysis wait for user response (see UIRESUME)
 % uiwait(handles.figure1);
 
@@ -109,6 +112,25 @@ function varargout = gui_analysis_OutputFcn(hObject, eventdata, handles)
 % Get default command line output from handles structure
 varargout{1} = handles.output;
 
+function chip_group_SelectionChangeFcn(hObject, eventdata)
+ global small
+ global large
+%retrieve GUI data, i.e. the handles structure
+handles = guidata(hObject); 
+ 
+switch get(eventdata.NewValue,'Tag')   % Get Tag of selected object
+    case 'small'
+      small = 1;
+      large = 0;
+ 
+    case 'large'
+        large = 1;
+        small = 0;
+    otherwise
+       % Code for when there is no match.
+end
+%updates the handles structure
+guidata(hObject, handles);
 
 % --- Executes on slider movement.
 function TestNumSlider_Callback(hObject, eventdata, handles)

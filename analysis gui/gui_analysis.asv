@@ -71,6 +71,32 @@ cd ..;
 homepath = pwd;
 cd(curdir);
 if(ispc)
+    circlepath = [homepath '\circle detect'];
+    AnalysisPath = [homepath '\Analysis_Methods\Line_Profile\'];
+    GuiPath = [homepath '\analysis gui'];
+    LogPath = [homepath '\logistic'];
+end
+if(ismac)
+    circlepath = [homepath '/circle detect'];
+    AnalysisPath = [homepath '/Analysis_Methods/Line_Profile'];
+    GuiPath = [homepath '/analysis gui'];
+    LogPath = [homepath '/logistic'];
+end
+
+if(isempty(regexp(path,circlepath)))
+    path(path, circlepath);
+end
+if(isempty(regexp(path,AnalysisPath)))
+    path(path, AnalysisPath)
+end
+if(isempty(regexp(path,GuiPath)))
+    path(path, GuiPath)
+end
+if(isempty(regexp(path,LogPath)))
+    path(path, LogPath)
+end
+set(handles.chip_group,'SelectionChangeFcn',@chip_group_SelectionChangeFcn);
+
 % UIWAIT makes gui_analysis wait for user response (see UIRESUME)
 % uiwait(handles.figure1);
 
@@ -85,6 +111,29 @@ function varargout = gui_analysis_OutputFcn(hObject, eventdata, handles)
 % Get default command line output from handles structure
 varargout{1} = handles.output;
 
+function chip_group_SelectionChangeFcn(hObject, eventdata)
+ 
+%retrieve GUI data, i.e. the handles structure
+handles = guidata(hObject); 
+ 
+switch get(eventdata.NewValue,'Tag')   % Get Tag of selected object
+    case 'small'
+      %execute this code when fontsize08_radiobutton is selected
+      set(handles.display_staticText,'FontSize',8);
+ 
+    case 'large'
+      %execute this code when fontsize12_radiobutton is selected
+      set(handles.display_staticText,'FontSize',12);
+ 
+    case 'fontsize16_radiobutton'
+      %execute this code when fontsize16_radiobutton is selected  
+      set(handles.display_staticText,'FontSize',16);
+    otherwise
+       % Code for when there is no match.
+ 
+end
+%updates the handles structure
+guidata(hObject, handles);
 
 % --- Executes on slider movement.
 function TestNumSlider_Callback(hObject, eventdata, handles)
@@ -288,7 +337,6 @@ if(get(handles.color, 'Value'))
    % Success(hObject, eventdata, handles) fill this in
 elseif(get(handles.epi, 'Value'))
     Dose_Fluor(handles.axes3,handles, tests,conts)
-    pause();
      Success(hObject, eventdata, handles);
 end
 
