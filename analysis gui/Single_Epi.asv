@@ -1,4 +1,4 @@
-function [runname direct] = Single_Color(hObject, test, cont);
+function [runname direct] = Single_Color(hObject, plothandle, test, cont);
 %% This section of code determines the infromation about the number of
 %% images, the image with the highest exposure (used to find the beads) and
 %% all the imge filenames and corresponding exposure
@@ -29,18 +29,7 @@ keyboard;
 cd(direct);
 direct_info = dir;
 handles = guidata(hObject);
-plothandles = handles.axes3;
-large = get(handles.large, 'Value');
-small = get(handles.small, 'Value');
-if (large)
-    ccols = 5;
-    crows = 4; %chip rows and columns
-elseif(small)
-    ccols = 4;
-    crows = 3;
-else
-    error('wtf')
-end
+plothandles = handles.ax
 num_image = 0;
 cal_exp = 380;
 cal_exp_index = 0;

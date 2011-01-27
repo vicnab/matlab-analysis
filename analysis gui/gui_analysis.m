@@ -366,7 +366,7 @@ if(get(handles.color, 'Value'))
     pause();
     Success(hObject, eventdata, handles)
 elseif(get(handles.epi, 'Value'))
-    [runname direct] = Single_Epi(handles.axes3, tests, conts);
+    [runname direct] = Single_Epi(hObject, tests, conts);
     Single_Run_Analysis_Color(handles, runname, direct);
     pause();
      Success(hObject, eventdata, handles);

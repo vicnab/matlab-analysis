@@ -57,7 +57,7 @@ function gui_analysis_OpeningFcn(hObject, eventdata, handles, varargin)
 handles.output = hObject;
 
 % Update handles structure
-guidata(hObject, handles);
+
 global TestNum;
 
 set(handles.Single, 'Enable', 'Off');
@@ -96,6 +96,7 @@ if(isempty(regexp(path,LogPath)))
     path(path, LogPath)
 end
 set(handles.chip_group,'SelectionChangeFcn',@chip_group_SelectionChangeFcn);
+guidata(hObject, handles);
 
 % UIWAIT makes gui_analysis wait for user response (see UIRESUME)
 % uiwait(handles.figure1);
@@ -112,25 +113,21 @@ function varargout = gui_analysis_OutputFcn(hObject, eventdata, handles)
 varargout{1} = handles.output;
 
 function chip_group_SelectionChangeFcn(hObject, eventdata)
- 
+ global small
+ global large
 %retrieve GUI data, i.e. the handles structure
 handles = guidata(hObject); 
  
 switch get(eventdata.NewValue,'Tag')   % Get Tag of selected object
     case 'small'
-      %execute this code when fontsize08_radiobutton is selected
-      set(handles.display_staticText,'FontSize',8);
+      small = 1;
+      large = 0;
  
     case 'large'
-      %execute this code when fontsize12_radiobutton is selected
-      set(handles.display_staticText,'FontSize',12);
- 
-    case 'fontsize16_radiobutton'
-      %execute this code when fontsize16_radiobutton is selected  
-      set(handles.display_staticText,'FontSize',16);
+        large = 1;
+        small = 0;
     otherwise
        % Code for when there is no match.
- 
 end
 %updates the handles structure
 guidata(hObject, handles);
@@ -369,7 +366,7 @@ if(get(handles.color, 'Value'))
     pause();
     Success(hObject, eventdata, handles)
 elseif(get(handles.epi, 'Value'))
-    [runname direct] = Single_Epi(handles.axes3, tests, conts);
+    [runname direct] = Single_Epi(hObject, tests, conts);
     Single_Run_Analysis_Color(handles, runname, direct);
     pause();
      Success(hObject, eventdata, handles);
