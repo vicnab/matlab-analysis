@@ -71,8 +71,8 @@ ncols = 5;%rows and columns of chip, can make an option in function call later
  magR1 = norm(R1);
  angR1 = atand(R1(2)/R1(1));
  B1 = topleft;
- R1x = magR1/(ncols-1) * [0:ncols-1] * cosd(angR1) + B1(1);
- R1y = magR1/(ncols-1) * [0:ncols-1] * sind(angR1) + B1(2);
+ R1x = magR1/4 * [0:ncols-1] * cosd(angR1) + B1(1);
+ R1y = magR1/4 * [0:ncols-1] * sind(angR1) + B1(2);
 
  B5 = topright;
  imshow(calimg);
@@ -85,8 +85,8 @@ ncols = 5;%rows and columns of chip, can make an option in function call later
  angC1 = atand(C1(2)/C1(1));
  beadsx = repmat(R1x, nrows, 1);
  beadsy = repmat(R1y, nrows, 1);
- xadd = [0:nrows-1]' * cosd(angC1) *magC1/(nrows-1);
- yadd = [0:nrows-1]' * sind(angC1) *magC1/(nrows-1); 
+ xadd = [0 1 2 3]' * cosd(angC1) *magC1/(n;
+ yadd = [0 1 2 3]' * sind(angC1) *magC1/3; 
  xadd = repmat(xadd, 1, ncols);
  yadd = repmat(yadd, 1, ncols);
 

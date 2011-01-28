@@ -1,4 +1,4 @@
-function [runname direct] = Single_Color(hObject, test, cont);
+function [runname direct] = Single_Color(cal_exp, hObject, test, cont);
 %% This section of code determines the infromation about the number of
 %% images, the image with the highest exposure (used to find the beads) and
 %% all the imge filenames and corresponding exposure
@@ -42,12 +42,10 @@ else
     error('wtf')
 end
 num_image = 0;
-cal_exp = 380;
 cal_exp_index = 0;
 imginfo = struct('name', [], 'exp', []); %% keeps track of every image name and exposure in directory
 for a = 1:length(direct_info)
     if(isempty(regexp(direct_info(a).name, 'top')))  %% want to exclude any top lit images from analysis
-        
         if(isempty(regexp(direct_info(a).name, 'Run')))  %% Run * files are already analyzed files
             if(~isempty(regexp(direct_info(a).name, '[0-9]')))  %% find images only with exposure time listed
                 if(~isempty(regexp(direct_info(a).name, 'ms'))) %% to make sure it's an image file
@@ -76,8 +74,8 @@ calfile= imginfo(find([imginfo.exp] == cal_exp)).name;
 calimg = imread(calfile);
 calimg = calimg(:,:,2);
 
-centers =centers_flour(calimg);
-centers_cell = cell(11,1);
+centers =centers_flour(calimg, ccols, crows);
+centers_cell = cell(num_image,1);
 for m = 1:length(centers_cell)
     centers_cell{m} = centers;
 end

@@ -22,7 +22,7 @@ function varargout = gui_analysis(varargin)
 
 % Edit the above text to modify the response to help gui_analysis
 
-% Last Modified by GUIDE v2.5 05-Jan-2011 23:46:30
+% Last Modified by GUIDE v2.5 28-Jan-2011 14:42:18
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -366,7 +366,8 @@ if(get(handles.color, 'Value'))
     pause();
     Success(hObject, eventdata, handles)
 elseif(get(handles.epi, 'Value'))
-    [runname direct] = Single_Epi(hObject, tests, conts);
+   cal_exp = str2num(get(handles.calexp, 'String'));
+    [runname direct] = Single_Epi(cal_exp, hObject,tests, conts);
     Single_Run_Analysis_Color(handles, runname, direct);
     pause();
      Success(hObject, eventdata, handles);
@@ -458,3 +459,26 @@ function figure1_ResizeFcn(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 
+
+
+
+function calexp_Callback(hObject, eventdata, handles)
+% hObject    handle to calexp (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of calexp as text
+%        str2double(get(hObject,'String')) returns contents of calexp as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function calexp_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to calexp (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
