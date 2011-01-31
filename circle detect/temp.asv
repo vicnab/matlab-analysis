@@ -1,0 +1,13 @@
+load('centersflourdebug.mat');
+[ymax xmax colors] = size(calimg);
+x = 1:xmax;
+lengthx = abs(magR1 * cosd(angR1));
+lengthy = abs(magC1 * sind(angC1));
+if(imgskew > 0)
+    y = beadsy(1) + (x-beadsx(1))/lengthx*sind(angR1)*magR1 + lengthy/(nrows*2);
+else
+    y = beadsy(1) - (x-beadsx(1))/lengthx*sind(angR1)*magR1 + lengthy/(nrows*2);
+end
+imshow(calimg);
+hold on;
+plot(x,y);

@@ -1,7 +1,4 @@
 function centers = centers_flour(calimg, ncols, nrows)
-nrows = 4;
-ncols = 5;%rows and columns of chip, can make an option in function call later
-
  [accum, circen, cirrad] = CircularHough_Grd(calimg, [35  50], 5,15,1);
  centers = circen;
  centers = [centers cirrad];
@@ -75,12 +72,10 @@ ncols = 5;%rows and columns of chip, can make an option in function call later
  R1y = magR1/(ncols-1) * [0:ncols-1] * sind(angR1) + B1(2);
 
  B5 = topright;
- imshow(calimg);
- hold on;
- plot(R1x, R1y, '*');
- 
+
  %vector for columms
  C1 = [bottomright(1) - topright(1) bottomright(2) - topright(2)];
+ 
  magC1 = norm(C1);
  angC1 = atand(C1(2)/C1(1));
  beadsx = repmat(R1x, nrows, 1);
@@ -97,79 +92,77 @@ ncols = 5;%rows and columns of chip, can make an option in function call later
      beadsy = beadsy + yadd;
      beadsx = beadsx + xadd;
  end
- plot(beadsx,beadsy, '*' );
+plot(beadsx,beadsy, '*' );
+ 
 %find rectangle around each bead now
-
- row1 = centers(find(centers(:,2)<1.15*miny),:);
- row2 = centers(find(centers(:,2)<1.1*(miny+ydist) & centers(:,2) > 1.15 * miny),:);
- row3 = centers(find(centers(:,2)<1.1*(miny+2*ydist) & centers(:,2) > 1.1 * (miny+1*ydist)),:);
- row4 = centers(find(centers(:,2)<1.1*(miny+3*ydist) & centers(:,2) > 1.1 * (miny+2*ydist)),:);
-
-
+if(nrows == 4)
+ [row1 row2 row3 row4] = return4rows(imgskew, nrows, ncols,magR1, angR1, magC1, angC1, centers, beadsx, beadsy, calimg);
+end
 meanrad = mean(centers(:,3));
-
-if(length(row1)<5)
-     row1 = findmissing(row1,topleft, bottomright, calimg, meanrad,0);
-end
-if(length(row2)<5)
-     row2 = findmissing(row2, topleft, bottomright, calimg, meanrad,0);
-end
-if(length(row3)<5)
-     row3 = findmissing(row3, topleft, bottomright, calimg, meanrad,0);
-end
-if(length(row4)<5)
-     row4 = findmissing(row4, topleft, bottomright, calimg, meanrad,0);
-end
-
-centers = [row1;row2;row3;row4];
+[rows1 cols1] = size(row1);
 [rows2 cols2] = size(row2);
 [rows3 cols3] = size(row3);
 [rows4 cols4] = size(row4);
-if(rows2 < 2)
-    xm = row1(1,1) - 2*row1(1,3);
-    ym = row1(1,2) + 2*row1(1,3);
-     width = row1(end,1) - row1(1,1) + 4 * row1(1,3);
-     height = 4*row1(1,3);
-     imtemp = imcrop(calimg, [xm ym width height]);
-     middle = mean(mean(imtemp));
-     imtemp(find(imtemp<.7*middle)) = middle;
-     vari = std(std(double(imtemp)));
-     imtemp(find(imtemp>(middle+1.5*vari))) = 255;
-     [accum, circen, cirrad] = CircularHough_Grd(imtemp, [40  50], 5,50,0.1);
-     circen(:,1) = circen(:,1) + xm;
-     circen(:,2) = circen(:,2) + ym;
-     centerstemp = [circen cirrad];
-    [garb sorted] = sort(centerstemp(:,1));
-     centerstemp = centerstemp(sorted,:);
-     row2 = centerstemp;
-     [rows2 cols2] = size(row2);
-     if(cols2<5)
-         row2 = findmissing(row2, topleft, bottomright, calimg, meanrad,0);
-     end   
+if(rows1<5)
+     row1 = findmissing(nrows, ncols, magR1, angR1, magC1, angC1, centers, beadsx, beadsy, calimg, imgskew, row1, 1);
 end
-if(rows3 < 2)
-    xm = row2(1,1) - 2*row2(1,3);
-    ym = row2(1,2) + 2*row2(1,3);
-     width = row1(end,1) - row1(1,1) + 4 * row1(1,3);
-     height = 4*row1(1,3);
-     imtemp = imcrop(calimg, [xm ym width height]);
-     middle = mean(mean(imtemp));
-     imtemp(find(imtemp<.7*middle)) = middle;
-     vari = std(std(double(imtemp)));
-     imtemp(find(imtemp>(middle+1.5*vari))) = 255;
-     [accum, circen, cirrad] = CircularHough_Grd(imtemp, [40  50], 5,50,0.1);
-     circen(:,1) = circen(:,1) + xm;
-     circen(:,2) = circen(:,2) + ym;
-     centerstemp = [circen cirrad];
-    [garb sorted] = sort(centerstemp(:,1));
-     centerstemp = centerstemp(sorted,:);
-     row3 = centerstemp;
-     [rows3 cols3] = size(row2);
-     if(cols3<5)
-         row3 = findmissing(row3, topleft, bottomright, calimg, meanrad,0);
-     end   
+if(rows2<5)
+     row2 = findmissing(nrows, ncols, magR1, angR1, magC1, angC1, centers, beadsx, beadsy, calimg, imgskew,row2, 2);
 end
-centers = [row1; row2; row3; row4];
+if(rows3<5)
+     row3 = findmissing(nrows, ncols, magR1, angR1, magC1, angC1, centers, beadsx, beadsy, calimg, imgskew, row3, 3);
+end
+if(rows4<5)
+     row4 = findmissing(nrows, ncols, magR1, angR1, magC1, angC1, centers, beadsx, beadsy, calimg, imgskew, row4,4);
+end
+
+centers = [row1;row2;row3;row4];
+
+% if(rows2 < 2)
+%     xm = row1(1,1) - 2*row1(1,3);
+%     ym = row1(1,2) + 2*row1(1,3);
+%      width = row1(end,1) - row1(1,1) + 4 * row1(1,3);
+%      height = 4*row1(1,3);
+%      imtemp = imcrop(calimg, [xm ym width height]);
+%      middle = mean(mean(imtemp));
+%      imtemp(find(imtemp<.7*middle)) = middle;
+%      vari = std(std(double(imtemp)));
+%      imtemp(find(imtemp>(middle+1.5*vari))) = 255;
+%      [accum, circen, cirrad] = CircularHough_Grd(imtemp, [40  50], 5,50,0.1);
+%      circen(:,1) = circen(:,1) + xm;
+%      circen(:,2) = circen(:,2) + ym;
+%      centerstemp = [circen cirrad];
+%     [garb sorted] = sort(centerstemp(:,1));
+%      centerstemp = centerstemp(sorted,:);
+%      row2 = centerstemp;
+%      [rows2 cols2] = size(row2);
+%      if(cols2<5)
+%          row2 = findmissing(row2, topleft, bottomright, calimg, meanrad,0);
+%      end   
+% end
+% if(rows3 < 2)
+%     xm = row2(1,1) - 2*row2(1,3);
+%     ym = row2(1,2) + 2*row2(1,3);
+%      width = row1(end,1) - row1(1,1) + 4 * row1(1,3);
+%      height = 4*row1(1,3);
+%      imtemp = imcrop(calimg, [xm ym width height]);
+%      middle = mean(mean(imtemp));
+%      imtemp(find(imtemp<.7*middle)) = middle;
+%      vari = std(std(double(imtemp)));
+%      imtemp(find(imtemp>(middle+1.5*vari))) = 255;
+%      [accum, circen, cirrad] = CircularHough_Grd(imtemp, [40  50], 5,50,0.1);
+%      circen(:,1) = circen(:,1) + xm;
+%      circen(:,2) = circen(:,2) + ym;
+%      centerstemp = [circen cirrad];
+%     [garb sorted] = sort(centerstemp(:,1));
+%      centerstemp = centerstemp(sorted,:);
+%      row3 = centerstemp;
+%      [rows3 cols3] = size(row2);
+%      if(cols3<5)
+%          row3 = findmissing(row3, topleft, bottomright, calimg, meanrad,0);
+%      end   
+% end
+%centers = [row1; row2; row3; row4];
      
 imshow(calimg);
 hold on;
