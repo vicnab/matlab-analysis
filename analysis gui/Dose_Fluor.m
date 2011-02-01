@@ -1,4 +1,4 @@
-function [runname direct] = Dose_Fluor(plothandle,handles, test, cont);
+function [runname direct] = Dose_Fluor(cal_exp, hObject, test, cont);
 %% This function is long but limited in its utility. First, it determines
 %% the number of concentrations and exposures at each concentration. This
 %% takes so many lines of code because the code is intended to be flexible.
@@ -24,13 +24,12 @@ elseif(ismac)
 else
     disp('Not a mac or a PC ?????')
 end
-
+handles = guidata(hObject);
 
 
 cd(direct);
 direct_info = dir;
 num_img = 0;
-cal_exp = 380;
 num_conc  =0;
 conc_vec = [];
 conc_cell = {};
@@ -47,9 +46,7 @@ num_exp = 0;
 %% exact concentrations used. It doesn't find the index for each concentration,
 %% that will be done in the next loop
 for a = 1:length(direct_info)
-
     if(isempty(regexp(direct_info(a).name, 'top')))  %% want to exclude any top lit images from analysis
-
         if(isempty(regexp(direct_info(a).name, 'Run')))  %% Run * files are already analyzed files
             if(~isempty(regexp(direct_info(a).name, '[0-9]')))  %% find images only with exposure time listed
                 if(~isempty(regexp(direct_info(a).name, 'ms'))) %% to make sure it's an image file
@@ -178,7 +175,7 @@ for b = 1:num_conc
         images{c} = conc_cell(c,b);
     end
 
-    everything{b} = Dose_Fluor_Analysis(plothandle, direct, test, cont, images, exp_vec, conc_vec(b), cal_exp, num_test, units);
+    everything{b} = Dose_Fluor_Analysis(hObject, direct, test, cont, images, exp_vec, conc_vec(b), cal_exp, num_test, units);
 end
 
 write_data_create_dose_response_function(handles, direct, num_test, num_exp, num_conc, everything, exp_vec, conc_vec);

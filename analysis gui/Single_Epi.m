@@ -33,11 +33,11 @@ plothandles = handles.axes3;
 large = get(handles.large, 'Value');
 small = get(handles.small, 'Value');
 if (large)
-    ccols = 5;
-    crows = 4; %chip rows and columns
+    ncols = 5;
+    nrows = 4; %chip rows and columns
 elseif(small)
-    ccols = 4;
-    crows = 3;
+    ncols = 4;
+    nrows = 3;
 else
     error('wtf')
 end
@@ -74,7 +74,7 @@ calfile= imginfo(find([imginfo.exp] == cal_exp)).name;
 calimg = imread(calfile);
 calimg = calimg(:,:,2);
 
-centers =centers_flour(calimg, ccols, crows);
+centers =centers_flour(calimg, ncols, nrows);
 centers_cell = cell(num_image,1);
 for m = 1:length(centers_cell)
     centers_cell{m} = centers;

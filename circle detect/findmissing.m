@@ -27,7 +27,7 @@ if(~isempty(row))
     for i = 1:length(row(:,1))
         x =  beadsx(rownum,1) + (row(i,2)-beadsy(1))/lengthy*cosd(angC1)*magC1 + lengthx/(ncols*2);
         if(row(i,1) < x)
-            bead1 = row(i,:)
+            bead1 = row(i,:);
             ind = i;
         end
     end
@@ -454,7 +454,7 @@ img(find(img < middle)) = 0;
 if(isempty(circen) | cirrad < 40)
     newcenter = [];
 elseif(length(circen(:,1))>1)
-    newcenter = []
+    newcenter = [];
     warning('Found multiple centers so deleted both ');
 else
     circen(1) = circen(1) + xbound;

@@ -1,10 +1,22 @@
-function [data_cell] = Dose_Flour_Analysis(plothandle, direct, test, cont, images, exp_vec, conc, cal_exp, num_test, units);
-
+function [data_cell] = Dose_Flour_Analysis(hObject, direct, test, cont, images, exp_vec, conc, cal_exp, num_test, units);
+handles = guidata(hObject);
+large = get(handles.large, 'Value');
+small = get(handles.small, 'Value');
+if (large)
+    ncols = 5;
+    nrows = 4; %chip rows and columns
+elseif(small)
+    ncols = 4;
+    nrows = 3;
+else
+    error('wtf')
+end
+plothandle = handles.axes3;
 num_exp = length(exp_vec);
 num_image = num_exp;
 calfile = images{find(exp_vec == cal_exp)};
 calimg = imread(calfile{:});
-centers = centers_flour(calimg(:,:,2));
+centers = centers_flour(calimg(:,:,2), ncols, nrows);
 centers_cell = cell(num_exp,1);
 for m = 1:length(centers_cell)
     centers_cell{m} = centers;

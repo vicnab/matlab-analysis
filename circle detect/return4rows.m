@@ -18,7 +18,7 @@ for i = 1:length(centers(:,1))
     end
     if(centers(i,2) <y)
         row1 = [row1; centers(i,:)];
-        ind = [ind; i]
+        ind = [ind; i];
     end
 end
 centers = removerowsben(centers, ind);

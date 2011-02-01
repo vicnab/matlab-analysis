@@ -333,7 +333,8 @@ if(get(handles.color, 'Value'))
   %  pause();
    % Success(hObject, eventdata, handles) fill this in
 elseif(get(handles.epi, 'Value'))
-    Dose_Fluor(handles.axes3,handles, tests,conts)
+    cal_exp = str2num(get(handles.calexp, 'String'));
+     Dose_Fluor(cal_exp, hObject, tests,conts)
      Success(hObject, eventdata, handles);
 end
 
