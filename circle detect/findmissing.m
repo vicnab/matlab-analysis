@@ -23,70 +23,72 @@ else
     x = beadsx(1) - (y-beadsy(1))/lengthy*cosd(angC1)*magC1 + lengthx/(ncols*2);
 end
 ind = [];
-for i = 1:length(row(:,1))
-    x =  beadsx(rownum,1) + (row(i,2)-beadsy(1))/lengthy*cosd(angC1)*magC1 + lengthx/(ncols*2);
-    if(row(i,1) < x)
-        bead1 = row(i,:)
-        ind = i;
-    end
-end
 if(~isempty(row))
-    if(~isempty(ind))
-        row = removerowsben(row, ind);
-        ind = [];
+    for i = 1:length(row(:,1))
+        x =  beadsx(rownum,1) + (row(i,2)-beadsy(1))/lengthy*cosd(angC1)*magC1 + lengthx/(ncols*2);
+        if(row(i,1) < x)
+            bead1 = row(i,:)
+            ind = i;
+        end
+    end
+    if(~isempty(row))
+        if(~isempty(ind))
+            row = removerowsben(row, ind);
+            ind = [];
+        end
+        
+        for i = 1:length(row(:,1))
+            x =  beadsx(rownum,2) + (row(i,2)-beadsy(1))/lengthy*cosd(angC1)*magC1 + lengthx/(ncols*2);
+            if(row(i,1) < x)
+                bead2 = row(i,:);
+                ind = i;
+            end
+        end
+    end
+    if(~isempty(row))
+        if(~isempty(ind))
+            row = removerowsben(row, ind);
+            ind = [];
+        end
+        
+        for i = 1:length(row(:,1))
+            x =  beadsx(rownum,3) + (row(i,2)-beadsy(1))/lengthy*cosd(angC1)*magC1 + lengthx/(ncols*2);
+            if(row(i,1) < x)
+                bead3 = row(i,:);
+                ind = i;
+            end
+        end
+    end
+    if(~isempty(row))
+        if(~isempty(ind))
+            row = removerowsben(row, ind);
+            ind = [];
+        end
+        
+        for i = 1:length(row(:,1))
+            x =  beadsx(rownum,4) + (row(i,2)-beadsy(1))/lengthy*cosd(angC1)*magC1 + lengthx/(ncols*2);
+            if(row(i,1) < x)
+                bead4 = row(i,:);
+                ind = i;
+            end
+        end
     end
     
-    for i = 1:length(row(:,1))
-        x =  beadsx(rownum,2) + (row(i,2)-beadsy(1))/lengthy*cosd(angC1)*magC1 + lengthx/(ncols*2);
-        if(row(i,1) < x)
-            bead2 = row(i,:);
-            ind = i;
-        end
-    end
-end
-if(~isempty(row))
-    if(~isempty(ind))
-        row = removerowsben(row, ind);
-        ind = [];
-    end
     
-    for i = 1:length(row(:,1))
-        x =  beadsx(rownum,3) + (row(i,2)-beadsy(1))/lengthy*cosd(angC1)*magC1 + lengthx/(ncols*2);
-        if(row(i,1) < x)
-            bead3 = row(i,:);
-            ind = i;
+    if(~isempty(row))
+        if(~isempty(ind))
+            row = removerowsben(row, ind);
+            ind = [];
+        end
+        for i = 1:length(row(:,1))
+            x =  beadsx(rownum,5) + (row(i,2)-beadsy(1))/lengthy*cosd(angC1)*magC1 + lengthx/(ncols*2);
+            if(row(i,1) < x)
+                bead5 = row(i,:);
+                ind = i;
+            end
         end
     end
 end
-if(~isempty(row))
-    if(~isempty(ind))
-        row = removerowsben(row, ind);
-        ind = [];
-    end
-    
-    for i = 1:length(row(:,1))
-        x =  beadsx(rownum,4) + (row(i,2)-beadsy(1))/lengthy*cosd(angC1)*magC1 + lengthx/(ncols*2);
-        if(row(i,1) < x)
-            bead4 = row(i,:);
-            ind = i;
-        end
-    end
-end
-
-if(~isempty(row))
-    if(~isempty(ind))
-        row = removerowsben(row, ind);
-        ind = [];
-    end
-    for i = 1:length(row(:,1))
-        x =  beadsx(rownum,5) + (row(i,2)-beadsy(1))/lengthy*cosd(angC1)*magC1 + lengthx/(ncols*2);
-        if(row(i,1) < x)
-            bead5 = row(i,:);
-            ind = i;
-        end
-    end
-end
-
 b1 = ~isempty(bead1);
 b2 = ~isempty(bead2);
 b3 = ~isempty(bead3);
@@ -116,6 +118,41 @@ b4 = ~isempty(bead4);
 b5 = ~isempty(bead5);
 numbeads = b1+b2+b3+b4+b5;
 row = [bead1; bead2; bead3; bead4; bead5];
+if(numbeads == 0)
+    warnmsg = sprintf('Total Approximation for Row %1.0f', rownum);
+    warning(warnmsg);
+    bead1 = [beadsx(rownum,1) beadsy(rownum,1) meanrad];
+    bead5 = [beadsx(rownum,5) beadsy(rownum,5) meanrad ];
+    numbeads = 2;
+    row = [bead1; bead2; bead3; bead4; bead5];
+    b1 = 1;
+    b5 = 1;
+elseif(numbeads == 1)
+    warnmsg = sprintf('Total Approximation for Row %1.0f', rownum);
+    warning(warnmsg);
+    if(b1)
+        bead5 = [beadsx(rownum,5) beadsy(rownum,5) meanrad];
+        b5 = 1;
+    elseif(b2)
+        bead5 = [beadsx(rownum,5) beadsy(rownum,5) meanrad];
+        b5 = 1;
+    elseif(b3)
+        bead5 = [beadsx(rownum,5) beadsy(rownum,5) meanrad];
+        b5=1
+    elseif(b4)
+        bead1 = [beadsx(rownum,1) beadsy(rownum,1) meanrad];
+        b1=1;
+    elseif(b5)
+        bead1 = [beadsx(rownum,1) beadsy(rownum,1) meanrad];
+        b1 = 1;
+    else
+        disp('WHAT ON EARTH?!?!?!')
+    end
+    numbeads = 2;
+end
+
+
+
 if(numbeads < 5)
     if(~b1)
         if(b5 & b2)
@@ -416,6 +453,9 @@ img(find(img < middle)) = 0;
 [accum, circen, cirrad] = CircularHough_Grd(img, [40  50], 5,50,0.1);
 if(isempty(circen) | cirrad < 40)
     newcenter = [];
+elseif(length(circen(:,1))>1)
+    newcenter = []
+    warning('Found multiple centers so deleted both ');
 else
     circen(1) = circen(1) + xbound;
     circen(2) = circen(2) + ybound;
