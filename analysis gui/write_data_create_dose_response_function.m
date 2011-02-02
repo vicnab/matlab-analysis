@@ -61,24 +61,26 @@ for i = 1:num_exp
             hold on; errorbar(conc_vec,redmeanvec, redstdvec, 'r*');
             title_text = sprintf('Dose response for %s using the red spectrum at %3.1f ms exposure', everything{1}{j,1}, everything{1}{j,2}(i));
             title(title_text);
+            hold off;
             subplot(2,2,2, 'Parent', handles.pan);
             dose_response(conc_vec, greenmeanvec);
             hold on; errorbar(conc_vec,greenmeanvec, greenstdvec, 'r*');
             title_text = sprintf('Dose response for %s using the green spectrum at %3.1f ms exposure', everything{1}{j,1}, everything{1}{j,2}(i));
             title(title_text);      
+            hold off;
             subplot(2,2,3, 'Parent', handles.pan);
             dose_response(conc_vec, bluemeanvec);
             hold on; errorbar(conc_vec,bluemeanvec, bluestdvec, 'r*');
             title_text = sprintf('Dose response for %s using the blue spectrum at %3.1f ms exposure', everything{1}{j,1}, everything{1}{j,2}(i));
             title(title_text);   
-            subplot(2,2,4, 'Parent', handles.pan);
-            
+            hold off;
+            subplot(2,2,4, 'Parent', handles.pan);           
             dose_response(conc_vec, graymeanvec);
             hold on; errorbar(conc_vec,graymeanvec, graystdvec, 'r*');
             title_text = sprintf('Dose response for %s using the gray spectrum at %3.1f ms exposure', everything{1}{j,1}, everything{1}{j,2}(i));
             title(title_text);  
            % set(gcf, 'Units', 'normalized', 'Position', [0 0 .5 1])
-          
+            hold off;
             saveas (gcf, sprintf('%s/%s/DoseResponse_%s_%3.0fms.fig',direct, 'Line_Method',everything{1}{j,1}, everything{1}{j,2}(i)))
             filesave = sprintf('%s/%s/DoseResponse_%s_%3.0fms',direct, 'Line_Method',everything{1}{j,1}, everything{1}{j,2}(i))
             exportcmd = sprintf('%s ''%s'' %s %s %s %s', 'export_fig', filesave, '-tif', '-nocrop', '-q105');
@@ -87,4 +89,5 @@ for i = 1:num_exp
         end
     end
     fprintf(fid, '\n');
+    
 end

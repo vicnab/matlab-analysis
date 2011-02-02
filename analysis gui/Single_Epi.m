@@ -29,7 +29,7 @@ keyboard;
 cd(direct);
 direct_info = dir;
 handles = guidata(hObject);
-plothandles = handles.axes3;
+plothandle = handles.axes3;
 large = get(handles.large, 'Value');
 small = get(handles.small, 'Value');
 if (large)

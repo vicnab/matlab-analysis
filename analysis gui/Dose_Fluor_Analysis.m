@@ -40,7 +40,8 @@ for i = 1:num_exp
         
     end
     hold off;
-    CentersValid = questdlg('Are the centers acceptable?', 'CentersQuest','Yes', 'No', 'No');
+   % CentersValid = questdlg('Are the centers acceptable?', 'CentersQuest','Yes', 'No', 'No');
+   CentersValid = 'Yes';
     ApplyWide = 'No';
     while (strcmp(CentersValid,'No'))
         FixAction = questdlg('How would you like to fix?', 'Fix','Delete Circle','Redraw for this Exposure', 'Nevermind They Are Fine', 'Nevermind They Are Fine');
@@ -267,7 +268,7 @@ pracrad = mean(centers(:,3));
 numlines =24;
 for j = 1:num_exp
     centers = centers_cell{j};
-    img = images{i};
+    img = images{j};
     img = imread(img{:});
     img = img(:,:,1:3);
     grayimg = rgb2gray(img);

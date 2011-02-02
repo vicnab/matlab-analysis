@@ -131,9 +131,7 @@ end
     
     
 for a = 1:length(direct_info)
-
     if(isempty(regexp(direct_info(a).name, 'top')))  %% want to exclude any top lit images from analysis
-
         if(isempty(regexp(direct_info(a).name, 'Run')))  %% Run * files are already analyzed files
             if(~isempty(regexp(direct_info(a).name, '[0-9]')))  %% find images only with exposure time listed
                 if(~isempty(regexp(direct_info(a).name, 'ms'))) %% to make sure it's an image file
@@ -148,8 +146,7 @@ for a = 1:length(direct_info)
                         conc = str2num(direct_info(a).name(concindex));
                         conc_num = find(conc_vec == conc);
                              [expindexbeg expindexend] = regexp(direct_info(a).name, 'ms');
-                         expindexbeg = expindexbeg - 4;
-                     
+                         expindexbeg = expindexbeg - 4;                   
                         if(expindexbeg<1)
                            expindexbeg = 1;
                         end
