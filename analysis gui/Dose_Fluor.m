@@ -1,4 +1,4 @@
-function [runname direct] = Dose_Fluor(cal_exp, hObject, test, cont);
+function [runname direct] = Dose_Fluor(hObject, test, cont);
 %% This function is long but limited in its utility. First, it determines
 %% the number of concentrations and exposures at each concentration. This
 %% takes so many lines of code because the code is intended to be flexible.
@@ -167,6 +167,8 @@ end
                       
 images = {};
 everything = {};
+cal_exp_num  =  listdlg('PromptString', 'Select an Exposure for Bead Detection', 'ListString', int2str(exp_vec'));
+cal_exp = exp_vec(cal_exp_num);
 for b = 1:num_conc 
     for c = 1:num_exp
         images{c} = conc_cell(c,b);

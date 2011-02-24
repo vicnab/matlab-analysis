@@ -1,7 +1,8 @@
-function [runname direct] = Single_Color(cal_exp, hObject, test, cont);
+function [runname direct] = Single_Epi(hObject, test, cont);
 %% This section of code determines the infromation about the number of
 %% images, the image with the highest exposure (used to find the beads) and
 %% all the imge filenames and corresponding exposure
+colorband = 2; %if fitc this is definitely the right choice for detecting location of beads
 [numtest samples] = size(cont);
 curdirect = pwd;
 if(ispc)
@@ -43,6 +44,7 @@ else
 end
 num_image = 0;
 cal_exp_index = 0;
+exp_vec = [];
 imginfo = struct('name', [], 'exp', []); %% keeps track of every image name and exposure in directory
 for a = 1:length(direct_info)
     if(isempty(regexp(direct_info(a).name, 'top')))  %% want to exclude any top lit images from analysis
@@ -58,6 +60,7 @@ for a = 1:length(direct_info)
                     subname = direct_info(a).name(msindexbeg:msindexend);
                     expindex = regexp(subname, '[0-9]') + msindexbeg-1; %%finds exposure time
                     exposure = str2num(direct_info(a).name(expindex));
+                      exp_vec = [exp_vec exposure];
                     imginfo(num_image+1).exp = exposure;  %%records exposure time
                     num_image = num_image + 1; %%indexes number of images
                 end
@@ -67,12 +70,16 @@ for a = 1:length(direct_info)
     end
 end
 [BS order] = sort([imginfo.exp]);
+exp_vec = exp_vec(order)
+cal_exp_num  =  listdlg('PromptString', 'Select an Exposure for Bead Detection', 'ListString', int2str(exp_vec'));
+cal_exp = exp_vec(cal_exp_num);
 
 imginfo = imginfo(order);
 
 calfile= imginfo(find([imginfo.exp] == cal_exp)).name;
 calimg = imread(calfile);
-calimg = calimg(:,:,2);
+calimg = calimg(:,:,colorband);
+
 
 centers =centers_flour(calimg, ncols, nrows);
 centers_cell = cell(num_image,1);
@@ -243,38 +250,10 @@ for i = 1:num_image
                 
                 
             case 'Redraw for this Exposure'
-                newcalimg = img(:,:,1);
-                newcalimg = 255/max(max(newcalimg)) * newcalimg;
-                [accum, circen, cirrad] = CircularHough_Grd(newcalimg, [8 25], 4,15,1);
-                clear accum;
+                newcalimg = img(:,:,colorband);
+                centers =centers_flour(newcalimg, ncols, nrows);
                 
-                %figure(1); imagesc(accum); axis image;
-                %title('Accumulation Array from Circular Hough Transform');
-                
-                
-                row1 = sortrows(circen(find(circen(:,2)<.3*10^3),:));
-                row2 = sortrows(circen(find(circen(:,2) < .5*10^3 & circen(:,2) > .3*10^3),:));
-                row3 = sortrows(circen(find(circen(:,2) < .7*10^3 & circen(:,2) > .5*10^3),:));
-                row4 = sortrows(circen(find(circen(:,2)>.7*10^3),:));
-                %%extrapolates missing circles (because calibrator beads are too dark!
-                for r =1:4
-                    rowname = sprintf('row%1.0f', r);
-                    if (length(eval(rowname))<5)
-                        minxy = min(eval(rowname));
-                        minx = minxy(1);
-                        maxxy = max(eval(rowname));
-                        maxx = maxxy(1);
-                        if(minx>300)
-                            extrapcom= sprintf('%s = addpointtorow(%s,1);', rowname, rowname); %%if the first bead is a calibrator bead, this will create circle where line angle dictates it should be
-                            eval(extrapcom);
-                        end
-                        if(maxx<900)
-                            extrapcom= sprintf('%s = addpointtorow(%s,5);', rowname, rowname); %%if the first bead is a calibrator bead, this will create circle where line angle dictates it should be
-                            eval(extrapcom);
-                        end
-                    end
-                end
-                centers = [row1;row2;row3;row4];
+                  
                 axes(plothandle); imagesc(img);  axis image;
                 xlabel('X Pixels');
                 ylabel('Y Pixels');

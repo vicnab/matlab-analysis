@@ -32,6 +32,7 @@ direct_info = dir;
 num_image = 0;
 cal_exp = 100;
 cal_exp_index = 0;
+exp_vec = [];
 for a = 1:length(direct_info)
     
     if(isempty(regexp(direct_info(a).name, 'top')))  %% want to exclude any top lit images from analysis
@@ -48,6 +49,7 @@ for a = 1:length(direct_info)
                     subname = direct_info(a).name(msindexbeg:msindexend);
                     expindex = regexp(subname, '[0-9]') + msindexbeg-1; %%finds exposure time
                     exposure = str2num(direct_info(a).name(expindex));
+                    exp_vec = [exp_vec exposure];
                     imginfo(num_image+1).exp = exposure;  %%records exposure time
                     num_image = num_image + 1; %%indexes number of images
                 end
@@ -57,8 +59,10 @@ for a = 1:length(direct_info)
     end
 end
 [BS order] = sort([imginfo.exp]);
-
+exp_vec = exp_vec(order);
 imginfo = imginfo(order);
+cal_exp_num  =  listdlg('PromptString', 'Select an Exposure for Bead Detection', 'ListString', int2str(exp_vec'));
+cal_exp = exp_vec(cal_exp_num);
 
 calfile= imginfo(find([imginfo.exp] == cal_exp)).name;
 calimg = imread(calfile);

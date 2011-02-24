@@ -334,7 +334,7 @@ if(get(handles.color, 'Value'))
    % Success(hObject, eventdata, handles) fill this in
 elseif(get(handles.epi, 'Value'))
     cal_exp = str2num(get(handles.calexp, 'String'));
-     Dose_Fluor(cal_exp, hObject, tests,conts)
+     Dose_Fluor(hObject, tests,conts)
      Success(hObject, eventdata, handles);
 end
 
@@ -368,7 +368,7 @@ if(get(handles.color, 'Value'))
     Success(hObject, eventdata, handles)
 elseif(get(handles.epi, 'Value'))
    cal_exp = str2num(get(handles.calexp, 'String'));
-    [runname direct] = Single_Epi(cal_exp, hObject,tests, conts);
+    [runname direct] = Single_Epi(hObject,tests, conts);
     Single_Run_Analysis_Color(handles, runname, direct);
     pause();
      Success(hObject, eventdata, handles);
