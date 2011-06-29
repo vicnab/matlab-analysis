@@ -450,7 +450,11 @@ vari = std(std(double(img)));
 middle = mean(mean(img));
 img(find(img > middle + 1.5 * vari)) = 255;
 img(find(img < middle)) = 0;
+try
 [accum, circen, cirrad] = CircularHough_Grd(img, [40  50], 5,50,0.1);
+catch 
+    circen = [];
+end
 if(isempty(circen) | cirrad < 40)
     newcenter = [];
 elseif(length(circen(:,1))>1)

@@ -1,4 +1,4 @@
-function [row] =  findmissing(nrows, ncols, magR1, angR1, magC1, angC1, centers, beadsx, beadsy, img,imgskew, row, rownum, debugon);
+function [row] =  findmissing_color(nrows, ncols, magR1, angR1, magC1, angC1, centers, beadsx, beadsy, img,imgskew, row, rownum, debugon);
 if(nargin<14)
     debugon = 0;
 end
@@ -451,8 +451,8 @@ middle = mean(mean(img));
 img(find(img > middle + 1.5 * vari)) = 255;
 img(find(img < middle)) = 0;
 try
-[accum, circen, cirrad] = CircularHough_Grd(img, [40  50], 5,50,0.1);
-catch ME
+[accum, circen, cirrad] = CircularHough_Grd(img, [20  35], 5,50,0.1);
+catch 
     circen = [];
 end
 if(isempty(circen) | cirrad < 40)
