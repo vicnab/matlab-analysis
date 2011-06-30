@@ -1,0 +1,201 @@
+function data_cell = Tina_Analysis(direct, numtest, tb1,cb1,tb2,cb2,tb3,cb3,tb4,cb4,tb5,cb5);
+%% This section of code determines the infromation about the number of
+%% images, the image with the highest exposure (used to find the beads) and
+%% all the imge filenames and corresponding exposure
+curdirect = pwd;
+if(isempty(regexp(path,direct)))
+    path(path,direct);
+end
+
+[starter ender] = regexp(pwd, 'analysis');
+linepath = curdirect(1:ender);
+if(ispc)
+    linepath = [linepath '\Analysis_Methods\Line_Profile'];
+elseif(ismac)
+    linepath = [linepath '/Analysis_Methods/Line_Profile'];
+else
+    error('what, not pc or mac?!?!?!')
+end
+if(isempty(regexp(path,linepath)))
+    path(path, linepath);
+end
+cd(direct);
+imginfo = struct('name', [], 'exp', []); %% keeps track of every image name and exposure in directory
+direct_info = dir;
+num_image = 0;
+cal_exp = 1500;
+cal_exp_index = 0;
+for a = 1:length(direct_info)
+    
+    if(isempty(regexp(direct_info(a).name, 'top')))  %% want to exclude any top lit images from analysis
+        
+        if(isempty(regexp(direct_info(a).name, 'Run')))  %% Run * files are already analyzed files
+            if(~isempty(regexp(direct_info(a).name, '[0-9]')))  %% find images only with exposure time listed
+                if(~isempty(regexp(direct_info(a).name, 'ms'))) %% to make sure it's an image file
+                    imginfo(num_image+1).name = direct_info(a).name; %%saves file name
+                    expindex = regexp(direct_info(a).name, '[0-9]'); %%finds exposure time
+                    exposure = str2num(direct_info(a).name(expindex));
+                    imginfo(num_image+1).exp = exposure;  %%records exposure time
+                    num_image = num_image + 1; %%indexes number of images
+                end
+                
+            end
+        end
+    end
+end
+[BS order] = sort([imginfo.exp]);
+
+imginfo = imginfo(order);
+calfile= imginfo(find([imginfo.exp] == cal_exp)).name;
+calimg = imread(calfile);
+calimg = calimg(:,:,1);
+calimg = 255/(max(max(calimg))) * calimg;
+ncols = 5;
+nrows = 4;
+path(path,curdirect);
+[centers meanrad] = colors_tina(calimg, ncols, nrows);
+pracrad = meanrad*.8;
+figure(1); imagesc(calimg); colormap('gray'); axis image;
+xlabel('X Pixels');
+ylabel('Y Pixels');
+title(sprintf('Exposure %2.0f ms', cal_exp));
+hold on;
+%plot(centers(:,1), centers(:,2), 'g+');
+for k = 1 : size(centers, 1),
+    DrawCircle(centers(k,1), centers(k,2), pracrad, 32, 'y-');
+end
+centers_cell = cell(num_image,1);
+for p =1:length(centers)-1
+    dist_cons = abs(centers(p)-centers(p+1)) + abs(centers(p)-centers(p+1));
+    if (dist_cons < 2)
+        centers = removerows(centers,p+1);
+    end
+    if ((p+1)>length(centers))
+        break
+    end
+    
+end
+for m = 1:length(centers_cell)
+    centers_cell{m} = centers;
+end
+
+clear centers
+
+title(['Raw Image with Circles Detected ', ...
+    '(center positions and radii marked)']);
+%figure(3); surf(accum, 'EdgeColor', 'none'); axis ij;
+%title('3-D View of the Accumulation Array');
+hold off;
+clear calimg;
+
+for i = 1:num_image
+    figure(1)
+    centers = centers_cell{i};
+    img = imread(imginfo(i).name);
+    img = img(:,:,1:3);
+    figure(1); imagesc(img);  axis image;
+    xlabel('X Pixels');
+    ylabel('Y Pixels');
+    title(sprintf('Exposure %2.0f ms', imginfo(i).exp));
+    hold on;
+    % plot(centers(:,1), centers(:,2), 'g+');
+    for k = 1 : size(centers, 1),
+        DrawCircle(centers(k,1), centers(k,2), pracrad, 32, 'r-');
+        
+    end
+    pause(0.25)
+end
+altercircles = questdlg('Do any centers need redone?', ...
+    'Center Altering', ...
+    'Yes', 'No', 'No');
+if(strcmp(altercircles, 'Yes'))
+    for i = 1:num_image
+        figure(1)
+        centers = centers_cell{i};
+        img = imread(imginfo(i).name);
+        img = img(:,:,1:3);
+        figure(1); imagesc(img);  axis image;
+        xlabel('X Pixels');
+        ylabel('Y Pixels');
+        title(sprintf('Exposure %2.0f ms', imginfo(i).exp));
+        hold on;
+        % plot(centers(:,1), centers(:,2), 'g+');
+        for k = 1 : size(centers, 1),
+            DrawCircle(centers(k,1), centers(k,2), pracrad, 32, 'r-');
+            
+        end
+        redo = questdlg('Do the centers look OK?', ...
+            'Center Verification', ...
+            'Yes', 'No', 'Yes');
+        if(strcmp(redo, 'No'))
+            [centers meanrad] = colors_tina(img(:,:,1), ncols, nrows);
+            hold off;
+            figure(1); imagesc(img);  axis image;
+            xlabel('X Pixels');
+            ylabel('Y Pixels');
+            title(sprintf('Redrawn Exposure %2.0f ms', imginfo(i).exp));
+            hold on;
+            for k = 1 : size(centers, 1),
+                DrawCircle(centers(k,1), centers(k,2), pracrad, 32, 'r-');
+            end
+            for k = i:size(centers,1)   %sets all centers beyond this to this center as most likely if chip moved, the rest of exposures will be affected
+                centers_cell{k} = centers;
+            end
+            pause;
+        end
+    end
+end
+    
+    data_cell = cell(2*numtest+1,10);
+    data_cell(1,:) = {'Condition', 'Exposure', 'Red Intensity Mean', 'Red Intensity Std', 'Green Intensity Mean', 'Green Intensity Std', 'Blue Intensity Mean', 'Blue Intensity Std', 'Gray Intensity Mean', 'Gray Intensity Std'};
+    tic
+    for j = 1:num_image;
+        centers = centers_cell{j};
+        img = imread(imginfo(j).name);
+        grayimg = rgb2gray(img);
+        [m n unused] = size(img);
+       
+        [maximared red_int]=line_prof_averages_and_maxima(centers,length(centers), 8,pracrad, double(img(:,:,1)));
+        [maximagreen green_int]=line_prof_averages_and_maxima(centers,length(centers), 8,pracrad, double(img(:,:,2)));
+        [maximablue blue_int]=line_prof_averages_and_maxima(centers,length(centers), 8, pracrad,double(img(:,:,3)));
+        [maximagray gray_int]=line_prof_averages_and_maxima(centers,length(centers), 8, pracrad, double(grayimg));
+        
+        counter = 1;
+        for condition = 1:numtest
+            counter = counter +1;
+            strucname = sprintf('test%1.0f', condition);
+            testname = sprintf('tb%1.0f', condition);
+            contname = sprintf('cb%1.0f', condition);
+            data_cell{counter,1} = sprintf('Test %1.0f', condition);
+            data_cell{counter,2} = [data_cell{counter,2} imginfo(j).exp];
+            data_cell{counter,3} = [data_cell{counter,3} mean(red_int(eval(testname)))];
+            data_cell{counter,4} = [data_cell{counter,4} std(red_int(eval(testname)))];
+            data_cell{counter,5} = [data_cell{counter,5} mean(green_int(eval(testname)))];
+            data_cell{counter,6} = [data_cell{counter,6} std(green_int(eval(testname)))];
+            data_cell{counter,7} = [data_cell{counter,7} mean(blue_int(eval(testname)))];
+            data_cell{counter,8} = [data_cell{counter,8} std(blue_int(eval(testname)))];
+            data_cell{counter,9} = [data_cell{counter,9} mean(gray_int(eval(testname)))];
+            data_cell{counter,10} = [data_cell{counter,10} std(gray_int(eval(testname)))];
+            counter = counter+1;
+            data_cell{counter,1} = sprintf('Control %1.0f', condition);
+            data_cell{counter,2} = [data_cell{counter,2} imginfo(j).exp] ;
+            data_cell{counter,3} = [data_cell{counter,3} mean(red_int(eval(contname)))];
+            data_cell{counter,4} = [data_cell{counter,4} std(red_int(eval(contname)))];
+            data_cell{counter,5} = [data_cell{counter,5} mean(green_int(eval(contname)))];
+            data_cell{counter,6} = [data_cell{counter,6} std(green_int(eval(contname)))];
+            data_cell{counter,7} = [data_cell{counter,7} mean(blue_int(eval(contname)))];
+            data_cell{counter,8} = [data_cell{counter,8} std(blue_int(eval(contname)))];
+            data_cell{counter,9} = [data_cell{counter,9} mean(gray_int(eval(contname)))];
+            data_cell{counter,10} = [data_cell{counter,10} std(gray_int(eval(contname)))];
+        end
+    end
+    
+    
+    %clear;
+    
+    
+    cd(curdirect);
+    
+    
+    
+    

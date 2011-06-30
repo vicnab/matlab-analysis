@@ -1,4 +1,4 @@
-function centers = colors_tina(calimg, ncols, nrows)
+function [centers meanrad] = colors_tina(calimg, ncols, nrows)
 [accum, circen, cirrad] = CircularHough_Grd(calimg, [20  30], 3,15,1);
 centers = circen;
 centers = [centers cirrad];
@@ -94,15 +94,13 @@ else
     beadsy = beadsy + yadd;
     beadsx = beadsx + xadd;
 end
+beadsx = beadsx'; %this is solely so bead numbering goes across top row, then 2nd row, etc.
+beadsy = beadsy';
 meanrad = mean(cirrad);
 centers = [];
 for i = 1:20
     centers = [centers ; beadsx(i) beadsy(i) meanrad];
 end
-imshow(calimg);
-hold on;
-for k = 1:length(centers)
-    DrawCircle(centers(k,1), centers(k,2), centers(k,3), 32, '-b', 2);
-end
+
 
 
