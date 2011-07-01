@@ -30,53 +30,11 @@ end
 distance = (centers(:,1)-0).^2 + (centers(:,2)-bottomy).^2;
 bottomleft  = centers(find(distance == min(distance)),:);
 topright = centers(find(distance == max(distance)),:);
-imshow(calimg);hold on;
-plot(bottomleft(1), bottomleft(2), 'bx');
-
-hold off;
-manualselectbottom = questdlg('Is the bottom left bead correctly selected?', ...
+imagesc(calimg);
+manualselect = questdlg('Are the bottom left and top right beads correctly selected?', ...
     'Critical Beads', ...
     'Yes', 'No', 'No');
-bottomleftimg = calimg(bottomy-300:bottomy, 1:300, :);
-if(strcmp(manualselectbottom, 'No'))
-    uiwait(msgbox('select center of bottom left bead', 'Bottom Left', 'modal')) 
-    correct = 'No';
-    while(strcmp(correct, 'No'))
-        hold off;
-        imshow(bottomleftimg);
-        [bottomleft(1) bottomleft(2)] = ginput(1);
-        imshow(calimg);
-        bottomleft(2) = bottomy-300 + bottomleft(2);
-        hold on; plot(bottomleft(1), bottomleft(2), 'bx')
-        correct = questdlg('Is the bottom left correct now?', 'Bottom Left', 'Yes', 'No', 'No');
-        if(strcmp(correct, 'No'))
-            uiwait(msgbox('Reselect center of bottom left bead', 'Redo', 'modal'));
-        end
-    end
-end
-hold off;
-imshow(calimg); hold on;
-plot(topright(1), topright(2), 'bx');
-manualselecttop = questdlg('Is the top right bead correctly selected?', ...
-    'Critical Beads', ...
-    'Yes', 'No', 'No');
-toprightimg = calimg(1:300, topx-300:topx, :);
-if(strcmp(manualselecttop, 'No'))
-    uiwait(msgbox('select center of top right bead', 'Bottom Left', 'modal')) 
-    correct = 'No';
-    while(strcmp(correct, 'No'))
-        hold off;
-        imshow(toprightimg);
-        [topright(1) topright(2)] = ginput(1);
-        imshow(calimg);
-        topright(1) = topx-300 + topright(1);
-        hold on; plot(topright(1), topright(2), 'bx')
-        correct = questdlg('Is the top right bead correct now?', 'Top Right', 'Yes', 'No', 'No');
-        if(strcmp(correct, 'No'))
-            uiwait(msgbox('Reselect center of top right bead', 'Redo', 'modal'));
-        end
-    end
-end
+if(strcmpr(manualselect, 'No'))
     
 a = [ 1 0]; % x unit vector
 xdiag = topright(1)- bottomleft(1);

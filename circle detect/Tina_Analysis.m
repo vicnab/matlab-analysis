@@ -23,7 +23,7 @@ cd(direct);
 imginfo = struct('name', [], 'exp', []); %% keeps track of every image name and exposure in directory
 direct_info = dir;
 num_image = 0;
-cal_exp = 1500;
+cal_exp = 469;
 cal_exp_index = 0;
 for a = 1:length(direct_info)
     
@@ -62,7 +62,7 @@ title(sprintf('Exposure %2.0f ms', cal_exp));
 hold on;
 %plot(centers(:,1), centers(:,2), 'g+');
 for k = 1 : size(centers, 1),
-    DrawCircle(centers(k,1), centers(k,2), pracrad, 32, 'y-');
+    DrawCircle(centers(k,1), centers(k,2), pracrad, 32, 'b-');
 end
 centers_cell = cell(num_image,1);
 for p =1:length(centers)-1
@@ -100,7 +100,7 @@ for i = 1:num_image
     hold on;
     % plot(centers(:,1), centers(:,2), 'g+');
     for k = 1 : size(centers, 1),
-        DrawCircle(centers(k,1), centers(k,2), pracrad, 32, 'r-');
+        DrawCircle(centers(k,1), centers(k,2), pracrad, 32, 'b-');
         
     end
     pause(0.25)
@@ -121,7 +121,7 @@ if(strcmp(altercircles, 'Yes'))
         hold on;
         % plot(centers(:,1), centers(:,2), 'g+');
         for k = 1 : size(centers, 1),
-            DrawCircle(centers(k,1), centers(k,2), pracrad, 32, 'r-');
+            DrawCircle(centers(k,1), centers(k,2), pracrad, 32, 'b-');
             
         end
         redo = questdlg('Do the centers look OK?', ...
@@ -136,7 +136,7 @@ if(strcmp(altercircles, 'Yes'))
             title(sprintf('Redrawn Exposure %2.0f ms', imginfo(i).exp));
             hold on;
             for k = 1 : size(centers, 1),
-                DrawCircle(centers(k,1), centers(k,2), pracrad, 32, 'r-');
+                DrawCircle(centers(k,1), centers(k,2), pracrad, 32, 'b-');
             end
             for k = i:size(centers,1)   %sets all centers beyond this to this center as most likely if chip moved, the rest of exposures will be affected
                 centers_cell{k} = centers;
@@ -152,8 +152,12 @@ end
     for j = 1:num_image;
         centers = centers_cell{j};
         img = imread(imginfo(j).name);
+         [m n unused] = size(img);
+        if (unused > 3)
+            img = img(:,:, 1:3); %removes stupid transparency layer sometimes otherwise saved
+        end
         grayimg = rgb2gray(img);
-        [m n unused] = size(img);
+       
        
         [maximared red_int]=line_prof_averages_and_maxima(centers,length(centers), 8,pracrad, double(img(:,:,1)));
         [maximagreen green_int]=line_prof_averages_and_maxima(centers,length(centers), 8,pracrad, double(img(:,:,2)));

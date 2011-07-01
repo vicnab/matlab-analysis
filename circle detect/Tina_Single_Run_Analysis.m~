@@ -21,10 +21,10 @@ for k = 1:length(run{2,2}) %first element that is data
     end
     
 end
-fid = fopen([rundir '/' runname '_summary.csv'], 'w');
+fid = fopen([rundir '/' runname '/summary.csv'], 'w');
 for k = 1:length(run{2,2}) %first element that is data
-    fprintf(fid, 'Summary at %4.0f ms Exposure \n', run{j,2}(k))
-    fprintf(fid, 'Exposure, Percent CV, Test:Control Ratio \n');
+    fprintf(fid, 'Summary at %2.2f Exposure \n', run{j,2}(k))
+    fprintf(fid, 'Exposure', '%CV
     for j = 2:conditions
        if (mod(j,2) == 0)
             conditionname = testnames{j/2};
