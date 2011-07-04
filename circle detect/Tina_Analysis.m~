@@ -170,6 +170,7 @@ end
             testname = sprintf('tb%1.0f', condition);
             contname = sprintf('cb%1.0f', condition);
             redtestval = red_int(eval(testname));
+            redtestval2 = redtestval
             greentestval = green_int(eval(testname));
             bluetestval = blue_int(eval(testname));
             graytestval = gray_int(eval(testname));
@@ -177,46 +178,6 @@ end
             greencontval = green_int(eval(contname));
             bluecontval = blue_int(eval(contname));
             graycontval = gray_int(eval(contname));
-            [redtestval idx outliers] = deleteoutliers(redtestval);
-            if(~isempty(outliers))
-                msgout = sprintf('Outlier Removed in %s', testname);
-                disp(msgout);
-            end
-             [greentestval idx outliers] = deleteoutliers(greentestval);
-            if(~isempty(outliers))
-               msgout = sprintf('Outlier Removed in %s', testname);
-                disp(msgout);
-            end
-            [bluetestval idx outliers] = deleteoutliers(bluetestval);
-            if(~isempty(outliers))
-                msgout = sprintf('Outlier Removed in %s', testname);
-                disp(msgout);
-            end
-            [graytestval idx outliers] = deleteoutliers(graytestval);
-            if(~isempty(outliers))
-                msgout = sprintf('Outlier Removed in %s', testname);
-                disp(msgout);
-            end
-             [redcontval idx outliers] = deleteoutliers(redcontval);
-            if(~isempty(outliers))
-                msgout = sprintf('Outlier Removed in %s', contname);
-                disp(msgout);
-            end
-             [greencontval idx outliers] = deleteoutliers(greencontval);
-            if(~isempty(outliers))
-                msgout = sprintf('Outlier Removed in %s', contname);
-                disp(msgout);
-            end
-            [bluecontval idx outliers] = deleteoutliers(bluecontval);
-            if(~isempty(outliers))
-                msgout = sprintf('Outlier Removed in %s', contname);
-                disp(msgout);
-            end
-            [graycontval idx outliers] = deleteoutliers(graycontval);
-            if(~isempty(outliers))
-                msgout = sprintf('Outlier Removed in %s', contname);
-                disp(msgout);
-            end
             data_cell{counter,1} = sprintf('Test %1.0f', condition);
             data_cell{counter,2} = [data_cell{counter,2} imginfo(j).exp];
             data_cell{counter,3} = [data_cell{counter,3} mean(redtestval)];

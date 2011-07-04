@@ -2,7 +2,7 @@
 if(ispc)
     passdir = 'Z:\Co-workers\Undergraduates\Tina\Assays\06_15_2011\run 4_10 ng';
 elseif(ismac)
-    passdir = '/Users/Ben/Dropbox/colorimetric psa detection/Assays/06_24_2011/run 1_25 ng';
+    passdir = '/Users/Ben/Dropbox/colorimetric psa detection/Assays/06_24_2011/run 2_100 ng';
 else
     disp('Not a mac or a PC WTF')
 end

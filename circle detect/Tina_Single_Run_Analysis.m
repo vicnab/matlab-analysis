@@ -12,7 +12,7 @@ for k = 1:length(run{2,2}) %first element that is data
         if (mod(j,2) == 0)
             conditionname = testnames{j/2};
         else
-            conditionname = [testnames{floor(j/2)} ' control']
+            conditionname = [testnames{floor(j/2)} ' control'];
         end
         fprintf(fid, '%s, %2.2f, %2.2f, %2.2f, %2.2f, %2.2f, %2.2f, %2.2f, %2.2f, %2.2f\n', conditionname, run{j,2}(k), run{j,3}(k), run{j,4}(k), run{j,5}(k), run{j,6}(k), run{j,7}(k), run{j,8}(k), run{j,9}(k), run{j,10}(k));
         if j == conditions
@@ -29,7 +29,7 @@ for k = 1:length(run{2,2}) %first element that is data
        if (mod(j,2) == 0)
             conditionname = testnames{j/2};
         else
-            conditionname = [testnames{floor(j/2)} ' control']
+            conditionname = [testnames{floor(j/2)} ' control'];
         end
     end
     
