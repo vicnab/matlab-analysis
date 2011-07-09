@@ -2,7 +2,7 @@
 if(ispc)
     passdir = 'Z:\Co-workers\Undergraduates\Tina\Assays\06_15_2011\run 4_10 ng';
 elseif(ismac)
-    passdir = '/Users/Ben/Dropbox/colorimetric psa detection/Assays/06_24_2011/run 2_100 ng';
+    passdir = '/Users/Ben/Desktop/Tina PSA Colorimetric Data/06_01_2011/run 6_cal, neg, AEC speed 20';
 else
     disp('Not a mac or a PC WTF')
 end
@@ -10,16 +10,18 @@ returndir = pwd;
 %passdir = uigetdir;
 runname = passdir(end-4:end);
 
-number_tests = 3;
-tb1 = [2 3 4 5 ];
-tb2 = [7 8 9 10];
-tb3 = [12 13 14 15];
-cb1 = [11 16 17 18 19];
+number_tests = ;
+tb1 = [2 3 4 ];
+tb2 = [7 8 9 ];
+tb3 = [12 13 14];
+tb4 = [17 18 19];
+cb1 = [5 11 16 10];
 cb2 = cb1;
 cb3 = cb1;
-run = Tina_Analysis(passdir, number_tests, tb1, cb1, tb2, cb2, tb3, cb3);
+cb4 =cb1;
+run = Tina_Analysis(passdir, number_tests, tb1, cb1, tb2, cb2, tb3, cb3,tb4, cb4);
 save([passdir '/' runname '.mat'], 'run');
 clear run;
-testnames = {'M167', 'P20C', '5G6'};
+testnames = {'M167', 'M165', 'P20C', '5G6'};
 Tina_Single_Run_Analysis(testnames, runname, passdir);
 cd(returndir);

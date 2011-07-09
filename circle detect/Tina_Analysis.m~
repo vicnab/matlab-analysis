@@ -163,14 +163,45 @@ end
         [maximagreen green_int]=line_prof_averages_and_maxima_with_subtraction(centers,length(centers), 8,pracrad, double(img(:,:,2)));
         [maximablue blue_int]=line_prof_averages_and_maxima_with_subtraction(centers,length(centers), 8, pracrad,double(img(:,:,3)));
         [maximagray gray_int]=line_prof_averages_and_maxima_with_subtraction(centers,length(centers), 8, pracrad, double(grayimg));
-        counter = 1;
+        
+      
+            for condition = 1:numtest
+                
+                strucname = sprintf('test%1.0f', condition);
+                testname = sprintf('tb%1.0f', condition);
+                contname = sprintf('cb%1.0f', condition);
+                redtestval = red_int(eval(testname));
+                greentestval = green_int(eval(testname));
+                bluetestval = blue_int(eval(testname));
+                graytestval = gray_int(eval(testname));
+                redcontval = red_int(eval(contname));
+                greencontval = green_int(eval(contname));
+                bluecontval = blue_int(eval(contname));
+                graycontval = gray_int(eval(contname));
+                [garbage idx outliers] = deleteoutliers(bluetestval);
+                if(~isempty(idx))
+                    temp = eval(testname);
+                    temp = removerows(temp', idx)';
+                    cmd = sprintf('%s = %s', testname, 'temp');
+                    eval(cmd);
+                    
+                end
+                [garbage idx outliers] = deleteoutliers(bluecontval);
+                if(~isempty(idx))
+                    temp = eval(contname);
+                    temp = removerows(temp', idx)'
+                    cmd = sprintf('%s = %s', contname, 'temp');
+                    eval(cmd);
+                end
+            end
+              counter = 1;
+              
         for condition = 1:numtest
             counter = counter +1;
             strucname = sprintf('test%1.0f', condition);
             testname = sprintf('tb%1.0f', condition);
             contname = sprintf('cb%1.0f', condition);
             redtestval = red_int(eval(testname));
-            redtestval2 = redtestval
             greentestval = green_int(eval(testname));
             bluetestval = blue_int(eval(testname));
             graytestval = gray_int(eval(testname));
@@ -178,6 +209,7 @@ end
             greencontval = green_int(eval(contname));
             bluecontval = blue_int(eval(contname));
             graycontval = gray_int(eval(contname));
+           
             data_cell{counter,1} = sprintf('Test %1.0f', condition);
             data_cell{counter,2} = [data_cell{counter,2} imginfo(j).exp];
             data_cell{counter,3} = [data_cell{counter,3} mean(redtestval)];

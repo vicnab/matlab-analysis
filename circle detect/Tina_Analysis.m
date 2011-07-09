@@ -26,19 +26,19 @@ num_image = 0;
 cal_exp = 469;
 cal_exp_index = 0;
 for a = 1:length(direct_info)
-    
+
     if(isempty(regexp(direct_info(a).name, 'top')))  %% want to exclude any top lit images from analysis
-        
-        if(isempty(regexp(direct_info(a).name, 'Run')))  %% Run * files are already analyzed files
-            if(~isempty(regexp(direct_info(a).name, '[0-9]')))  %% find images only with exposure time listed
-                if(~isempty(regexp(direct_info(a).name, 'ms'))) %% to make sure it's an image file
-                    imginfo(num_image+1).name = direct_info(a).name; %%saves file name
-                    expindex = regexp(direct_info(a).name, '[0-9]'); %%finds exposure time
-                    exposure = str2num(direct_info(a).name(expindex));
-                    imginfo(num_image+1).exp = exposure;  %%records exposure time
-                    num_image = num_image + 1; %%indexes number of images
+        if(~isempty(regexp(direct_info(a).name, 'bef')))  %% Run * files are already analyzed files
+            if(isempty(regexp(direct_info(a).name, 'Run')))  %% Run * files are already analyzed files
+                if(~isempty(regexp(direct_info(a).name, '[0-9]')))  %% find images only with exposure time listed
+                    if(~isempty(regexp(direct_info(a).name, 'ms'))) %% to make sure it's an image file
+                        imginfo(num_image+1).name = direct_info(a).name; %%saves file name
+                        expindex = regexp(direct_info(a).name, '[0-9]'); %%finds exposure time
+                        exposure = str2num(direct_info(a).name(expindex));
+                        imginfo(num_image+1).exp = exposure;  %%records exposure time
+                        num_image = num_image + 1; %%indexes number of images
+                    end
                 end
-                
             end
         end
     end
@@ -73,7 +73,7 @@ for p =1:length(centers)-1
     if ((p+1)>length(centers))
         break
     end
-    
+
 end
 for m = 1:length(centers_cell)
     centers_cell{m} = centers;
@@ -101,7 +101,7 @@ for i = 1:num_image
     % plot(centers(:,1), centers(:,2), 'g+');
     for k = 1 : size(centers, 1),
         DrawCircle(centers(k,1), centers(k,2), pracrad, 32, 'b-');
-        
+
     end
     pause(0.25)
 end
@@ -122,7 +122,7 @@ if(strcmp(altercircles, 'Yes'))
         % plot(centers(:,1), centers(:,2), 'g+');
         for k = 1 : size(centers, 1),
             DrawCircle(centers(k,1), centers(k,2), pracrad, 32, 'b-');
-            
+
         end
         redo = questdlg('Do the centers look OK?', ...
             'Center Verification', ...
@@ -145,108 +145,118 @@ if(strcmp(altercircles, 'Yes'))
         end
     end
 end
-    
-    data_cell = cell(2*numtest+1,10);
-    data_cell(1,:) = {'Condition', 'Exposure', 'Red Intensity Mean', 'Red Intensity Std', 'Green Intensity Mean', 'Green Intensity Std', 'Blue Intensity Mean', 'Blue Intensity Std', 'Gray Intensity Mean', 'Gray Intensity Std'};
-    tic
-    for j = 1:num_image;
-        centers = centers_cell{j};
-        img = imread(imginfo(j).name);
-         [m n unused] = size(img);
-        if (unused > 3)
-            img = img(:,:, 1:3); %removes stupid transparency layer sometimes otherwise saved
-        end
-        grayimg = rgb2gray(img);
-       
-       
-        [maximared red_int]=line_prof_averages_and_maxima_with_subtraction(centers,length(centers), 8,pracrad, double(img(:,:,1)));
-        [maximagreen green_int]=line_prof_averages_and_maxima_with_subtraction(centers,length(centers), 8,pracrad, double(img(:,:,2)));
-        [maximablue blue_int]=line_prof_averages_and_maxima_with_subtraction(centers,length(centers), 8, pracrad,double(img(:,:,3)));
-        [maximagray gray_int]=line_prof_averages_and_maxima_with_subtraction(centers,length(centers), 8, pracrad, double(grayimg));
-        counter = 1;
-        for condition = 1:numtest
-            counter = counter +1;
-            strucname = sprintf('test%1.0f', condition);
-            testname = sprintf('tb%1.0f', condition);
-            contname = sprintf('cb%1.0f', condition);
-            redtestval = red_int(eval(testname));
-            greentestval = green_int(eval(testname));
-            bluetestval = blue_int(eval(testname));
-            graytestval = gray_int(eval(testname));
-            redcontval = red_int(eval(contname));
-            greencontval = green_int(eval(contname));
-            bluecontval = blue_int(eval(contname));
-            graycontval = gray_int(eval(contname));
-            [redtestval idx outliers] = deleteoutliers(redtestval);
-            if(~isempty(outliers))
-                msgout = sprintf('Outlier Removed in %s', testname);
-                disp(msgout);
-            end
-             [greentestval idx outliers] = deleteoutliers(greentestval);
-            if(~isempty(outliers))
-               msgout = sprintf('Outlier Removed in %s', testname);
-                disp(msgout);
-            end
-            [bluetestval idx outliers] = deleteoutliers(bluetestval);
-            if(~isempty(outliers))
-                msgout = sprintf('Outlier Removed in %s', testname);
-                disp(msgout);
-            end
-            [graytestval idx outliers] = deleteoutliers(graytestval);
-            if(~isempty(outliers))
-                msgout = sprintf('Outlier Removed in %s', testname);
-                disp(msgout);
-            end
-             [redcontval idx outliers] = deleteoutliers(redcontval);
-            if(~isempty(outliers))
-                msgout = sprintf('Outlier Removed in %s', contname);
-                disp(msgout);
-            end
-             [greencontval idx outliers] = deleteoutliers(greencontval);
-            if(~isempty(outliers))
-                msgout = sprintf('Outlier Removed in %s', contname);
-                disp(msgout);
-            end
-            [bluecontval idx outliers] = deleteoutliers(bluecontval);
-            if(~isempty(outliers))
-                msgout = sprintf('Outlier Removed in %s', contname);
-                disp(msgout);
-            end
-            [graycontval idx outliers] = deleteoutliers(graycontval);
-            if(~isempty(outliers))
-                msgout = sprintf('Outlier Removed in %s', contname);
-                disp(msgout);
-            end
-            data_cell{counter,1} = sprintf('Test %1.0f', condition);
-            data_cell{counter,2} = [data_cell{counter,2} imginfo(j).exp];
-            data_cell{counter,3} = [data_cell{counter,3} mean(redtestval)];
-            data_cell{counter,4} = [data_cell{counter,4} std(redtestval)];
-            data_cell{counter,5} = [data_cell{counter,5} mean(greentestval)];
-            data_cell{counter,6} = [data_cell{counter,6} std(greentestval)];
-            data_cell{counter,7} = [data_cell{counter,7} mean(bluetestval)];
-            data_cell{counter,8} = [data_cell{counter,8} std(bluetestval)];
-            data_cell{counter,9} = [data_cell{counter,9} mean(graytestval)];
-            data_cell{counter,10} = [data_cell{counter,10} std(graytestval)];
-            counter = counter+1;
-            data_cell{counter,1} = sprintf('Control %1.0f', condition);
-            data_cell{counter,2} = [data_cell{counter,2} imginfo(j).exp] ;
-            data_cell{counter,3} = [data_cell{counter,3} mean(redcontval)];
-            data_cell{counter,4} = [data_cell{counter,4} std(redcontval)];
-            data_cell{counter,5} = [data_cell{counter,5} mean(greencontval)];
-            data_cell{counter,6} = [data_cell{counter,6} std(greencontval)];
-            data_cell{counter,7} = [data_cell{counter,7} mean(bluecontval)];
-            data_cell{counter,8} = [data_cell{counter,8} std(bluecontval)];
-            data_cell{counter,9} = [data_cell{counter,9} mean(graycontval)];
-            data_cell{counter,10} = [data_cell{counter,10} std(graycontval)];
-        end
+
+data_cell = cell(2*numtest+1,10);
+data_cell(1,:) = {'Condition', 'Exposure', 'Red Intensity Mean', 'Red Intensity Std', 'Green Intensity Mean', 'Green Intensity Std', 'Blue Intensity Mean', 'Blue Intensity Std', 'Gray Intensity Mean', 'Gray Intensity Std'};
+tic
+%used to remove outliers based on middle exposure
+outlier_img = floor(num_image/2);
+centers = centers_cell{outlier_img};
+img = imread(imginfo(outlier_img).name);
+[m n unused] = size(img);
+if (unused > 3)
+    img = img(:,:, 1:3); %removes stupid transparency layer sometimes otherwise saved
+end
+grayimg = rgb2gray(img);
+[maximared red_int]=line_prof_averages_and_maxima_with_subtraction(centers,length(centers), 8,pracrad, double(img(:,:,1)));
+[maximagreen green_int]=line_prof_averages_and_maxima_with_subtraction(centers,length(centers), 8,pracrad, double(img(:,:,2)));
+[maximablue blue_int]=line_prof_averages_and_maxima_with_subtraction(centers,length(centers), 8, pracrad,double(img(:,:,3)));
+[maximagray gray_int]=line_prof_averages_and_maxima_with_subtraction(centers,length(centers), 8, pracrad, double(grayimg));
+
+
+for condition = 1:numtest
+
+    strucname = sprintf('test%1.0f', condition);
+    testname = sprintf('tb%1.0f', condition);
+    contname = sprintf('cb%1.0f', condition);
+    redtestval = red_int(eval(testname));
+    greentestval = green_int(eval(testname));
+    bluetestval = blue_int(eval(testname));
+    graytestval = gray_int(eval(testname));
+    redcontval = red_int(eval(contname));
+    greencontval = green_int(eval(contname));
+    bluecontval = blue_int(eval(contname));
+    graycontval = gray_int(eval(contname));
+    [garbage idx outliers] = deleteoutliers(bluetestval);
+    if(~isempty(idx))
+        temp = eval(testname);
+        temp = removerows(temp', idx)';
+        cmd = sprintf('%s = %s', testname, 'temp');
+        eval(cmd);
+
     end
-    
-    
-    %clear;
-    
-    
-    cd(curdirect);
-    
-    
-    
-    
+    [garbage idx outliers] = deleteoutliers(bluecontval);
+    if(~isempty(idx))
+        temp = eval(contname);
+        temp = removerows(temp', idx)';
+        cmd = sprintf('%s = %s', contname, 'temp');
+        eval(cmd);
+    end
+end
+
+for j = 1:num_image;
+    centers = centers_cell{j};
+    img = imread(imginfo(j).name);
+    [m n unused] = size(img);
+    if (unused > 3)
+        img = img(:,:, 1:3); %removes stupid transparency layer sometimes otherwise saved
+    end
+    grayimg = rgb2gray(img);
+
+
+    [maximared red_int]=line_prof_averages_and_maxima_with_subtraction(centers,length(centers), 8,pracrad, double(img(:,:,1)));
+    [maximagreen green_int]=line_prof_averages_and_maxima_with_subtraction(centers,length(centers), 8,pracrad, double(img(:,:,2)));
+    [maximablue blue_int]=line_prof_averages_and_maxima_with_subtraction(centers,length(centers), 8, pracrad,double(img(:,:,3)));
+    [maximagray gray_int]=line_prof_averages_and_maxima_with_subtraction(centers,length(centers), 8, pracrad, double(grayimg));
+
+
+    counter = 1;
+
+
+    for condition = 1:numtest
+        counter = counter +1;
+        strucname = sprintf('test%1.0f', condition);
+        testname = sprintf('tb%1.0f', condition);
+        contname = sprintf('cb%1.0f', condition);
+        redtestval = red_int(eval(testname));
+        greentestval = green_int(eval(testname));
+        bluetestval = blue_int(eval(testname));
+        graytestval = gray_int(eval(testname));
+        redcontval = red_int(eval(contname));
+        greencontval = green_int(eval(contname));
+        bluecontval = blue_int(eval(contname));
+        graycontval = gray_int(eval(contname));
+
+        data_cell{counter,1} = sprintf('Test %1.0f', condition);
+        data_cell{counter,2} = [data_cell{counter,2} imginfo(j).exp];
+        data_cell{counter,3} = [data_cell{counter,3} mean(redtestval)];
+        data_cell{counter,4} = [data_cell{counter,4} std(redtestval)];
+        data_cell{counter,5} = [data_cell{counter,5} mean(greentestval)];
+        data_cell{counter,6} = [data_cell{counter,6} std(greentestval)];
+        data_cell{counter,7} = [data_cell{counter,7} mean(bluetestval)];
+        data_cell{counter,8} = [data_cell{counter,8} std(bluetestval)];
+        data_cell{counter,9} = [data_cell{counter,9} mean(graytestval)];
+        data_cell{counter,10} = [data_cell{counter,10} std(graytestval)];
+        counter = counter+1;
+        data_cell{counter,1} = sprintf('Control %1.0f', condition);
+        data_cell{counter,2} = [data_cell{counter,2} imginfo(j).exp] ;
+        data_cell{counter,3} = [data_cell{counter,3} mean(redcontval)];
+        data_cell{counter,4} = [data_cell{counter,4} std(redcontval)];
+        data_cell{counter,5} = [data_cell{counter,5} mean(greencontval)];
+        data_cell{counter,6} = [data_cell{counter,6} std(greencontval)];
+        data_cell{counter,7} = [data_cell{counter,7} mean(bluecontval)];
+        data_cell{counter,8} = [data_cell{counter,8} std(bluecontval)];
+        data_cell{counter,9} = [data_cell{counter,9} mean(graycontval)];
+        data_cell{counter,10} = [data_cell{counter,10} std(graycontval)];
+    end
+end
+
+
+%clear;
+
+
+cd(curdirect);
+
+
+
+
