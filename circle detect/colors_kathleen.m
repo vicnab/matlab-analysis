@@ -24,7 +24,7 @@ hold on;
 for k = 1 : size(centers, 1),
     DrawCircle(centers(k,1), centers(k,2), cirrad(k), 32, 'r-');
 end
-keyboard;
+
 
 %%to find bottom right bead and top left bead ( the two beads the
 %%algorithm should ALWAYS be able to find, find the distance of the

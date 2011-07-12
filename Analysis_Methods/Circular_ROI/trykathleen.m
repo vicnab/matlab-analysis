@@ -1,0 +1,10 @@
+[y me me2] =  circular_ROI_cversion3(centers(:,1:2), 12, meanrad, double(calimgred), calimgred);
+mins = min(y');
+pos = mins(1:2:end);
+neg = mins(2:2:end);
+pos = 255 - pos;
+neg = 255-neg;
+meanpos = mean(pos)
+stdpos = std(pos)
+meanneg = mean(neg)
+stdneg = std(neg)
